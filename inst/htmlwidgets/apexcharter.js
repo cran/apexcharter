@@ -23,6 +23,9 @@ HTMLWidgets.widget({
         }
         ax_opts.chart.width = width;
         ax_opts.chart.height = height;
+        if (!ax_opts.chart.hasOwnProperty('parentHeightOffset')) {
+          ax_opts.chart.parentHeightOffset = 0;
+        }
 
         // Generate or update chart
         if (apexchart === null) {
