@@ -1,39 +1,40 @@
-## ----setup, include = FALSE----------------------------------------------
+## ----setup, include = FALSE---------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
 
-## ----message=FALSE, warning=FALSE----------------------------------------
+## ----message=FALSE, warning=FALSE---------------------------------------------
 library(ggplot2)
+library(scales)
 library(dplyr)
 library(apexcharter)
 
-## ----column--------------------------------------------------------------
+## ----column-------------------------------------------------------------------
 data("mpg")
 n_manufac <- count(mpg, manufacturer)
 
 apex(data = n_manufac, type = "column", mapping = aes(x = manufacturer, y = n))
 
-## ----bar-----------------------------------------------------------------
+## ----bar----------------------------------------------------------------------
 apex(data = n_manufac, type = "bar", mapping = aes(x = manufacturer, y = n))
 
-## ----dodge-bar-----------------------------------------------------------
+## ----dodge-bar----------------------------------------------------------------
 n_manufac_year <- count(mpg, manufacturer, year)
 
 apex(data = n_manufac_year, type = "column", mapping = aes(x = manufacturer, y = n, fill = year))
 
-## ----stacked-bar---------------------------------------------------------
+## ----stacked-bar--------------------------------------------------------------
 apex(data = n_manufac_year, type = "column", mapping = aes(x = manufacturer, y = n, fill = year)) %>% 
   ax_chart(stacked = TRUE)
 
-## ----line----------------------------------------------------------------
+## ----line---------------------------------------------------------------------
 data("economics")
 economics <- tail(economics, 100)
 
 apex(data = economics, type = "line", mapping = aes(x = date, y = uempmed))
 
-## ----lines---------------------------------------------------------------
+## ----lines--------------------------------------------------------------------
 data("economics_long")
 economics_long <- economics_long %>% 
   group_by(variable) %>% 
@@ -42,23 +43,23 @@ economics_long <- economics_long %>%
 apex(data = economics_long, type = "line", mapping = aes(x = date, y = value01, group = variable)) %>% 
   ax_yaxis(decimalsInFloat = 2) # number of decimals to keep
 
-## ----area----------------------------------------------------------------
+## ----area---------------------------------------------------------------------
 apex(data = economics_long, type = "area", mapping = aes(x = date, y = value01, fill = variable)) %>% 
   ax_yaxis(decimalsInFloat = 2) %>% # number of decimals to keep
   ax_chart(stacked = TRUE) %>%
   ax_yaxis(max = 4, tickAmount = 4)
 
-## ----scatter-------------------------------------------------------------
+## ----scatter------------------------------------------------------------------
 apex(data = mtcars, type = "scatter", mapping = aes(x = wt, y = mpg))
 
-## ----scatter-fill--------------------------------------------------------
+## ----scatter-fill-------------------------------------------------------------
 apex(data = mtcars, type = "scatter", mapping = aes(x = wt, y = mpg, fill = cyl)) %>%
   ax_xaxis(tickAmount = 5)
 
-## ----bubbles-------------------------------------------------------------
+## ----bubbles------------------------------------------------------------------
 apex(data = mtcars, type = "scatter", mapping = aes(x = wt, y = mpg, z = scales::rescale(qsec)))
 
-## ----pie-----------------------------------------------------------------
+## ----pie----------------------------------------------------------------------
 poll <- data.frame(
   answer = c("Yes", "No"),
   n = c(254, 238)
@@ -66,10 +67,10 @@ poll <- data.frame(
 
 apex(data = poll, type = "pie", mapping = aes(x = answer, y = n))
 
-## ----radial--------------------------------------------------------------
+## ----radial-------------------------------------------------------------------
 apex(data = NULL, type = "radialBar", mapping = aes(x = "My value", y = 65))
 
-## ----radial-mult---------------------------------------------------------
+## ----radial-mult--------------------------------------------------------------
 fruits <- data.frame(
   name = c('Apples', 'Oranges', 'Bananas', 'Berries'),
   value = c(44, 55, 67, 83)
@@ -78,12 +79,12 @@ fruits <- data.frame(
 apex(data = fruits, type = "radialBar", mapping = aes(x = name, y = value))
 
 
-## ----radar---------------------------------------------------------------
+## ----radar--------------------------------------------------------------------
 mtcars$model <- rownames(mtcars)
 
 apex(data = head(mtcars), type = "radar", mapping = aes(x = model, y = qsec))
 
-## ----radar-mult----------------------------------------------------------
+## ----radar-mult---------------------------------------------------------------
 # extremely complicated reshaping
 new_mtcars <- reshape(
   data = head(mtcars), 
@@ -97,7 +98,7 @@ new_mtcars <- reshape(
 
 apex(data = new_mtcars, type = "radar", mapping = aes(x = model, y = value, group = time))
 
-## ----heatmap-------------------------------------------------------------
+## ----heatmap------------------------------------------------------------------
 txhousing2 <- txhousing %>% 
   filter(city %in% head(unique(city)), year %in% c(2000, 2001)) %>% 
   rename(val_med = median)

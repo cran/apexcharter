@@ -12,44 +12,9 @@
 #'
 #' @importFrom htmlwidgets createWidget sizingPolicy
 #'
-#' @examples
-#'
-#' library(apexcharter)
-#' 
-#' # Use raw API by passing a list of
-#' # parameters to the function
-#' 
-#' apexchart(ax_opts = list(
-#'   chart = list(
-#'     type = "bar"
-#'   ),
-#'   series = list(list(
-#'     name = "Example",
-#'     data = sample(1:100, 5)
-#'   )),
-#'   xaxis = list(
-#'     categories = LETTERS[1:5]
-#'   )
-#' ))
-#' 
-#' 
-#' # Or use apexchart() to initialize the chart
-#' # before passing parameters
-#' 
-#' apexchart() %>% 
-#'   ax_chart(type = "bar") %>% 
-#'   ax_series(
-#'     list(
-#'       name = "Example",
-#'       data = sample(1:100, 5)
-#'     )
-#'   ) %>% 
-#'   ax_xaxis(
-#'     categories = LETTERS[1:5]
-#'   )
-#'   
+#' @example examples/apexchart.R
 apexchart <- function(ax_opts = list(), auto_update = TRUE, width = NULL, height = NULL, elementId = NULL) {
-
+  
   # forward options using x
   x <- list(
     ax_opts = ax_opts,
@@ -64,6 +29,24 @@ apexchart <- function(ax_opts = list(), auto_update = TRUE, width = NULL, height
     height = height,
     package = 'apexcharter',
     elementId = elementId,
+    preRenderHook = function(widget) {
+      if (!is.null(widget$x$ax_opts$chart$defaultLocale)) {
+        defaultLocale <- widget$x$ax_opts$chart$defaultLocale
+        defaultLocale <- match.arg(
+          arg = defaultLocale,
+          choices = c("de", "el", "en", "es", "fr", "hi", "hr", "hy", "id", "it", 
+                      "ko.js", "pt-br", "ru", "tr", "ua")
+        )
+        if (!is.null(widget$x$ax_opts$chart$locales)) {
+          warning("defaultLocale is used but will be ignored since a custom array for locales is provided.")
+        } else {
+          path <- system.file(file.path("htmlwidgets/lib/apexcharts-locales", paste0(defaultLocale, ".json")), package = "apexcharter")
+          locale <- jsonlite::fromJSON(txt = path)
+          widget$x$ax_opts$chart$locales <- list(locale)
+        }
+      }
+      widget
+    },
     sizingPolicy = htmlwidgets::sizingPolicy(
       defaultWidth = "100%",
       defaultHeight = "100%",
@@ -102,43 +85,7 @@ apexchart <- function(ax_opts = list(), auto_update = TRUE, width = NULL, height
 #'
 #' @importFrom htmlwidgets shinyWidgetOutput shinyRenderWidget
 #' 
-#' @examples 
-#' 
-#' if (interactive()) {
-#'   library(shiny)
-#'   
-#'   ui <- fluidPage(
-#'     fluidRow(
-#'       column(
-#'         width = 8, offset = 2,
-#'         tags$h2("Apexchart in Shiny"),
-#'         actionButton("redraw", "Redraw chart"),
-#'         apexchartOutput("chart")
-#'       )
-#'     )
-#'   )
-#'   
-#'   server <- function(input, output, session) {
-#'     
-#'     output$chart <- renderApexchart({
-#'       input$redraw
-#'       apexchart() %>%
-#'         ax_chart(type = "bar") %>%
-#'         ax_series(
-#'           list(
-#'             name = "Example",
-#'             data = sample(1:100, 5)
-#'           )
-#'         ) %>%
-#'         ax_xaxis(
-#'           categories = LETTERS[1:5]
-#'         )
-#'     })
-#'     
-#'   }
-#'   
-#'   shinyApp(ui, server)
-#' }
+#' @example examples/apexcharter-shiny.R
 apexchartOutput <- function(outputId, width = '100%', height = '400px'){
   htmlwidgets::shinyWidgetOutput(outputId, 'apexcharter', width, height, package = 'apexcharter')
 }

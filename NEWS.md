@@ -1,7 +1,16 @@
+apexcharter 0.1.3
+==================
+
+* Upgraded ApexCharts.js to 3.10.1
+* New function `format_num()` to format labels on y-axis or tooltip for example.
+* Added localization configs file, see `?ax_chart` for examples.
+
+
+
 apexcharter 0.1.2
 ==================
 
-* Update ApexCharts to 3.8.2
+* Upgraded ApexCharts.js to 3.8.2
 * Set parent container height to 0 by default (fix [#2](https://github.com/dreamRs/apexcharter/issues/2)).
 
 

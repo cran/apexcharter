@@ -4,8 +4,13 @@
 \alias{apexchart}
 \title{Create a apexcharts.js widget}
 \usage{
-apexchart(ax_opts = list(), auto_update = TRUE, width = NULL,
-  height = NULL, elementId = NULL)
+apexchart(
+  ax_opts = list(),
+  auto_update = TRUE,
+  width = NULL,
+  height = NULL,
+  elementId = NULL
+)
 }
 \arguments{
 \item{ax_opts}{A \code{list} in JSON format with chart parameters.}
@@ -25,7 +30,6 @@ A \code{apexcharts} \code{htmlwidget} object.
 Create a apexcharts.js widget
 }
 \examples{
-
 library(apexcharter)
 
 # Use raw API by passing a list of
@@ -48,16 +52,15 @@ apexchart(ax_opts = list(
 # Or use apexchart() to initialize the chart
 # before passing parameters
 
-apexchart() \%>\% 
-  ax_chart(type = "bar") \%>\% 
+apexchart() \%>\%
+  ax_chart(type = "bar") \%>\%
   ax_series(
     list(
       name = "Example",
       data = sample(1:100, 5)
     )
-  ) \%>\% 
+  ) \%>\%
   ax_xaxis(
     categories = LETTERS[1:5]
   )
-  
 }

@@ -12,7 +12,22 @@
 #'     \item{\code{continent_residence}}{Continent of origin of population}
 #'     \item{\code{continent_origin}}{Continent of residence of population}
 #'   }
-#' @source UNHCR (The UN Refugee Agency) (\url{http://popstats.unhcr.org/en/overview})
+#' @source UNHCR (The UN Refugee Agency) (\url{https://www.unhcr.org/})
 "unhcr_popstats_2017"
 
+
+#' UNHCR data by continent of origin
+#'
+#' The dataset contains data about UNHCR's populations of concern summarised by continent of origin.
+#'
+#' @format A data frame with 913 observations on the following 4 variables.
+#'   \describe{
+#'     \item{\code{year}}{Year concerned.}
+#'     \item{\code{population_type}}{Populations of concern : Refugees, Asylum-seekers, Internally displaced persons (IDPs), Returned refugees,
+#'     Returned IDPs, Stateless persons, Others of concern.}    
+#'     \item{\code{continent_origin}}{Continent of residence of population.}
+#'     \item{\code{n}}{Number of people concerned.}
+#'   }
+#' @source UNHCR (The UN Refugee Agency) (\url{https://www.unhcr.org/})
+"unhcr_ts"
 
