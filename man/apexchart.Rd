@@ -2,7 +2,7 @@
 % Please edit documentation in R/apexcharter.R
 \name{apexchart}
 \alias{apexchart}
-\title{Create a apexcharts.js widget}
+\title{Create an apexcharts.js widget}
 \usage{
 apexchart(
   ax_opts = list(),
@@ -15,7 +15,9 @@ apexchart(
 \arguments{
 \item{ax_opts}{A \code{list} in JSON format with chart parameters.}
 
-\item{auto_update}{In Shiny application, update existing chart rather than generating new one.}
+\item{auto_update}{In Shiny application, update existing chart
+rather than generating new one. Can be \code{TRUE}/\code{FALSE} or
+use \code{\link{config_update}} for more control.}
 
 \item{width}{A numeric input in pixels.}
 
@@ -27,7 +29,7 @@ apexchart(
 A \code{apexcharts} \code{htmlwidget} object.
 }
 \description{
-Create a apexcharts.js widget
+Create an apexcharts.js widget
 }
 \examples{
 library(apexcharter)

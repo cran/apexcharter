@@ -15,7 +15,7 @@
 #'
 #' @example examples/format.R
 format_num <- function(format, prefix = "", suffix = "", locale = "en-US") {
-  check_locale(locale)
+  check_locale_d3(locale)
   path <- system.file(file.path("htmlwidgets/lib/d3-format/locale", paste0(locale, ".json")), package = "apexcharter")
   if (path != "") {
     locale <- paste(readLines(con = path, encoding = "UTF-8"), collapse = "")
@@ -27,7 +27,7 @@ format_num <- function(format, prefix = "", suffix = "", locale = "en-US") {
 }
 
 
-check_locale <- function(x) {
+check_locale_d3 <- function(x) {
   json <- list.files(system.file("htmlwidgets/lib/d3-format/locale", package = "apexcharter"))
   njson <- gsub("\\.json", "", json)
   if (!x %in% njson) {
@@ -37,4 +37,28 @@ check_locale <- function(x) {
     ), call. = FALSE)
   }
 }
+
+
+
+
+
+#' Format date in JS
+#'
+#' @param x Date to use in JavaScript
+#'
+#' @return a JavaScript string
+#' @export
+#'
+format_date <- function(x) {
+  stopifnot(length(x) == 1)
+  JS(sprintf("new Date('%s').getTime()", x))
+}
+
+
+
+
+
+
+
+
 

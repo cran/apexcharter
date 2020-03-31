@@ -5,7 +5,6 @@ dropNulls <- function(x) {
   x[!vapply(x, is.null, FUN.VALUE = logical(1))]
 }
 
-
 `%||%` <- function(x, y) {
   if (!is.null(x)) x else y
 }
@@ -14,6 +13,27 @@ formatNoSci <- function(x) {
   if (is.null(x)) return(NULL)
   format(x, scientific = FALSE, digits = 15)
 }
+
+
+ununlist <- function(x) {
+  if (is.null(x))
+    return(x)
+  n <- names(x)
+  if (!is.null(n) && all(nzchar(n))) {
+    lapply(x, ununlist)
+  } else {
+    unlist(x)
+  }
+}
+
+
+to_posix <- function(x) {
+  if (!is.null(x)) {
+    x <- as.POSIXct(x/1000, origin = "1970-01-01", tz = "UTC")
+  }
+  x
+}
+
 
 
 #' Utility function to create ApexChart parameters JSON
@@ -32,7 +52,11 @@ formatNoSci <- function(x) {
   if (is.null(ax$x$ax_opts[[name]])) {
     ax$x$ax_opts[[name]] <- list(...)
   } else {
-    ax$x$ax_opts[[name]] <- utils::modifyList(x = ax$x$ax_opts[[name]], val = list(...), keep.null = TRUE)
+    ax$x$ax_opts[[name]] <- utils::modifyList(
+      x = ax$x$ax_opts[[name]], 
+      val = list(...), 
+      keep.null = TRUE
+    )
   }
   
   return(ax)
@@ -52,7 +76,11 @@ formatNoSci <- function(x) {
   if (is.null(ax$x$ax_opts[[name]])) {
     ax$x$ax_opts[[name]] <- l
   } else {
-    ax$x$ax_opts[[name]] <- utils::modifyList(x = ax$x$ax_opts[[name]], val = l, keep.null = TRUE)
+    ax$x$ax_opts[[name]] <- utils::modifyList(
+      x = ax$x$ax_opts[[name]], 
+      val = l, 
+      keep.null = TRUE
+    )
   }
   
   return(ax)

@@ -10,22 +10,32 @@ apex(
   type = "column",
   ...,
   auto_update = TRUE,
+  serie_name = NULL,
   width = NULL,
   height = NULL,
   elementId = NULL
 )
 }
 \arguments{
-\item{data}{Default dataset to use for chart. If not already a \code{data.frame}, it will be coerced to with \code{as.data.frame}.}
+\item{data}{Default dataset to use for chart. If not already
+a \code{data.frame}, it will be coerced to with \code{as.data.frame}.}
 
 \item{mapping}{Default list of aesthetic mappings to use for chart}
 
-\item{type}{Specify the chart type. Available Options: \code{"column"}, \code{"bar"}, \code{"line"},
-\code{"area"}, \code{"spline"}, \code{"pie"}, \code{"donut"}, \code{"radialBar"}, \code{"radar"}, \code{"scatter"}, \code{"heatmap"}.}
+\item{type}{Specify the chart type. Available options:
+\code{"column"}, \code{"bar"}, \code{"line"},
+\code{"area"}, \code{"spline"}, \code{"pie"}, \code{"donut"},
+\code{"radialBar"}, \code{"radar"}, \code{"scatter"}, \code{"heatmap"},
+\code{"timeline"}.}
 
 \item{...}{Other arguments passed on to methods. Not currently used.}
 
-\item{auto_update}{In Shiny application, update existing chart rather than generating new one.}
+\item{auto_update}{In Shiny application, update existing chart
+rather than generating new one. Can be \code{TRUE}/\code{FALSE} or
+use \code{\link{config_update}} for more control.}
+
+\item{serie_name}{Name for the serie displayed in tooltip,
+only used for single serie.}
 
 \item{width}{A numeric input in pixels.}
 
@@ -37,7 +47,8 @@ apex(
 A \code{apexcharts} \code{htmlwidget} object.
 }
 \description{
-Initialize a chart with three main parameters : data, mapping and type of chart.
+Initialize a chart with three main parameters :
+data, mapping and type of chart.
 }
 \examples{
 library(ggplot2)

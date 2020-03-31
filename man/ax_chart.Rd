@@ -38,9 +38,9 @@ ax_chart(
 \item{stackType}{When stacked, should the stacking be percentage based or normal stacking.
 Available options: \code{"normal"} or \code{"100\%"}.}
 
-\item{defaultLocale}{Locale to use : \code{"de"}, \code{"el"}, \code{"en"}, \code{"es"}, \code{"fr"},
-\code{"hi"}, \code{"hr"}, \code{"hy"}, \code{"id"}, \code{"it"}, \code{"ko"}, \code{"pt-br"}, 
-\code{"ru"}, \code{"tr"}, \code{"ua"}.}
+\item{defaultLocale}{Locale to use : \code{"ca"}, \code{"de"}, \code{"el"}, \code{"en"}, \code{"es"}, \code{"fi"}, \code{"fr"},
+\code{"hi"}, \code{"hr"}, \code{"hy"}, \code{"id"}, \code{"it"}, \code{"ko"}, \code{"nl"}, \code{"pt-br"},
+\code{"ru"}, \code{"se"}, \code{"tr"}, \code{"ua"}.}
 
 \item{locales}{Array of custom locales parameters.}
 
@@ -82,13 +82,21 @@ Chart parameters
 library(dplyr)
 data("diamonds", package = "ggplot2")
 
-# Stack bar type
+##  Stack bar type
+# default is dodge
+apex(
+  data = count(diamonds, cut, color),
+  mapping = aes(x = cut, y = n, fill = color)
+)
+
+# stack
 apex(
   data = count(diamonds, cut, color),
   mapping = aes(x = cut, y = n, fill = color)
 ) \%>\%
   ax_chart(stacked = TRUE)
 
+# stack filled
 apex(
   data = count(diamonds, cut, color),
   mapping = aes(x = cut, y = n, fill = color)
@@ -96,15 +104,56 @@ apex(
   ax_chart(stacked = TRUE, stackType = "100\%")
 
 
-# Toolbar
+
+
+# Toolbar --------------------------------------
+
+# Hide the toolbar
 apex(
   data = count(diamonds, cut, color),
   mapping = aes(x = cut, y = n, fill = color)
 ) \%>\%
   ax_chart(toolbar = list(show = FALSE))
 
-  
-  
+# Hide download buttons
+data("economics", package = "ggplot2")
+apex(
+  data = economics,
+  mapping = aes(x = date, y = pce), 
+  type = "line"
+) \%>\%
+  ax_chart(
+    toolbar = list(tools= list(download = FALSE))
+  )
+
+
+
+# Zoom -----------------------------------------
+
+# Disable
+apex(
+  data = economics,
+  mapping = aes(x = date, y = pce), 
+  type = "line"
+) \%>\%
+  ax_chart(
+    zoom = list(enabled = FALSE)
+  )
+
+
+# Auto-scale Y axis
+apex(
+  data = economics,
+  mapping = aes(x = date, y = pce), 
+  type = "line"
+) \%>\%
+  ax_chart(
+    zoom = list(autoScaleYaxis = TRUE)
+  )
+
+# Localization ---------------------------------
+
+
 # Use included localization config
 dat <- data.frame(
   x = Sys.Date() + 1:20,
@@ -125,7 +174,7 @@ apex(dat, aes(x, y), "line") \%>\%
 apex(dat, aes(x, y), "line") \%>\% 
   ax_chart(locales = list(
     list(
-      name = "en", # override en locale
+      name = "en", # override 'en' locale
       options = list(
         toolbar = list(
           exportToSVG = "GET SVG",

@@ -1,8 +1,10 @@
 
-#' Create a apexcharts.js widget
+#' Create an apexcharts.js widget
 #'
 #' @param ax_opts A \code{list} in JSON format with chart parameters.
-#' @param auto_update In Shiny application, update existing chart rather than generating new one.
+#' @param auto_update In Shiny application, update existing chart
+#'  rather than generating new one. Can be \code{TRUE}/\code{FALSE} or
+#'  use \code{\link{config_update}} for more control.
 #' @param width A numeric input in pixels.
 #' @param height A numeric input in pixels.
 #' @param elementId Use an explicit element ID for the widget.
@@ -15,7 +17,10 @@
 #' @example examples/apexchart.R
 apexchart <- function(ax_opts = list(), auto_update = TRUE, width = NULL, height = NULL, elementId = NULL) {
   
-  # forward options using x
+  if (isTRUE(auto_update)) {
+    auto_update <- config_update()
+  }
+
   x <- list(
     ax_opts = ax_opts,
     auto_update = auto_update
@@ -23,30 +28,13 @@ apexchart <- function(ax_opts = list(), auto_update = TRUE, width = NULL, height
 
   # create widget
   htmlwidgets::createWidget(
-    name = 'apexcharter',
+    name = "apexcharter",
     x = x,
     width = width,
     height = height,
-    package = 'apexcharter',
+    package = "apexcharter",
     elementId = elementId,
-    preRenderHook = function(widget) {
-      if (!is.null(widget$x$ax_opts$chart$defaultLocale)) {
-        defaultLocale <- widget$x$ax_opts$chart$defaultLocale
-        defaultLocale <- match.arg(
-          arg = defaultLocale,
-          choices = c("de", "el", "en", "es", "fr", "hi", "hr", "hy", "id", "it", 
-                      "ko.js", "pt-br", "ru", "tr", "ua")
-        )
-        if (!is.null(widget$x$ax_opts$chart$locales)) {
-          warning("defaultLocale is used but will be ignored since a custom array for locales is provided.")
-        } else {
-          path <- system.file(file.path("htmlwidgets/lib/apexcharts-locales", paste0(defaultLocale, ".json")), package = "apexcharter")
-          locale <- jsonlite::fromJSON(txt = path)
-          widget$x$ax_opts$chart$locales <- list(locale)
-        }
-      }
-      widget
-    },
+    preRenderHook = add_locale_apex,
     sizingPolicy = htmlwidgets::sizingPolicy(
       defaultWidth = "100%",
       defaultHeight = "100%",
@@ -58,10 +46,62 @@ apexchart <- function(ax_opts = list(), auto_update = TRUE, width = NULL, height
       browser.fill = TRUE,
       viewer.suppress = FALSE,
       browser.external = TRUE,
-      padding = 20
+      padding = 0
     )
   )
 }
+
+#' @importFrom jsonlite fromJSON
+add_locale_apex <- function(widget) {
+  if (!is.null(widget$x$ax_opts$chart$defaultLocale)) {
+    defaultLocale <- widget$x$ax_opts$chart$defaultLocale
+    defaultLocale <- match.arg(
+      arg = defaultLocale,
+      choices = c("ca", "de", "el", "en", "es", "fi", "fr", "hi", "hr", "hy",
+                  "id", "it", "ko", "nl", "pt-br", "ru", "se", "tr", "ua")
+    )
+    if (!is.null(widget$x$ax_opts$chart$locales)) {
+      warning(
+        "defaultLocale is used but will be ignored since",
+        " a custom array for locales is provided."
+      )
+    } else {
+      path <- system.file(
+        file.path("htmlwidgets/lib/apexcharts-locales", paste0(defaultLocale, ".json")),
+        package = "apexcharter"
+      )
+      locale <- jsonlite::fromJSON(txt = path)
+      widget$x$ax_opts$chart$locales <- list(locale)
+    }
+  }
+  widget
+}
+
+
+
+#' Configuration for auto update
+#'
+#' @param series_animate Should the chart animate on re-rendering.
+#' @param update_options Update or not global options for chart.
+#' @param options_animate Should the chart animate on re-rendering.
+#' @param options_redrawPaths When the chart is re-rendered,
+#'  should it draw from the existing paths or completely redraw 
+#'  the chart paths from the beginning. By default, the chart 
+#'  is re-rendered from the existing paths 
+#' 
+#' @export
+config_update <- function(series_animate = TRUE, 
+                          update_options = FALSE, 
+                          options_animate = TRUE, 
+                          options_redrawPaths = FALSE) {
+  list(
+    series_animate = series_animate, 
+    update_options = update_options, 
+    options_animate = options_animate, 
+    options_redrawPaths = options_redrawPaths
+  )
+}
+
 
 #' @title Shiny bindings for apexcharter
 #'
@@ -86,8 +126,8 @@ apexchart <- function(ax_opts = list(), auto_update = TRUE, width = NULL, height
 #' @importFrom htmlwidgets shinyWidgetOutput shinyRenderWidget
 #' 
 #' @example examples/apexcharter-shiny.R
-apexchartOutput <- function(outputId, width = '100%', height = '400px'){
-  htmlwidgets::shinyWidgetOutput(outputId, 'apexcharter', width, height, package = 'apexcharter')
+apexchartOutput <- function(outputId, width = "100%", height = "400px"){
+  htmlwidgets::shinyWidgetOutput(outputId, "apexcharter", width, height, package = "apexcharter")
 }
 
 #' @rdname apexcharter-shiny

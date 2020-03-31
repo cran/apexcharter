@@ -1,84 +1,40 @@
----
-title: "Starting with ApexCharts"
-author: "Victor Perrier"
-date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Starting with ApexCharts}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
----
-
-```{r setup, include = FALSE}
+## ----setup, include = FALSE---------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-```
 
-The objective of this vignette is to show how to quickly build data visualizations with the ApexCharts JavaScript library, as well as to give an overview of the different graphics available.
-
-Data used are from `ggplot2` package, data manipulation will be done with the `dplyr` package.
-
-
-```{r message=FALSE, warning=FALSE}
+## ----message=FALSE, warning=FALSE---------------------------------------------
 library(ggplot2)
 library(scales)
 library(dplyr)
 library(apexcharter)
-```
 
-
-## Bar charts
-
-Simple bar charts can be created with:
-
-```{r column}
+## ----column-------------------------------------------------------------------
 data("mpg")
 n_manufac <- count(mpg, manufacturer)
 
 apex(data = n_manufac, type = "column", mapping = aes(x = manufacturer, y = n))
-```
 
-Flipping coordinates can be done by using `type = "bar"`:
-
-```{r bar}
+## ----bar----------------------------------------------------------------------
 apex(data = n_manufac, type = "bar", mapping = aes(x = manufacturer, y = n))
-```
 
-
-To create a dodge bar charts, use aesthetic `fill` :
-
-```{r dodge-bar}
+## ----dodge-bar----------------------------------------------------------------
 n_manufac_year <- count(mpg, manufacturer, year)
 
 apex(data = n_manufac_year, type = "column", mapping = aes(x = manufacturer, y = n, fill = year))
-```
 
-For stacked bar charts, specify option `stacked` in `ax_chart` :
-
-```{r stacked-bar}
+## ----stacked-bar--------------------------------------------------------------
 apex(data = n_manufac_year, type = "column", mapping = aes(x = manufacturer, y = n, fill = year)) %>% 
   ax_chart(stacked = TRUE)
-```
 
-
-
-## Line charts
-
-Simple line charts can be created with (works with `character`, `Date` or `POSIXct`):
-
-```{r line}
+## ----line---------------------------------------------------------------------
 data("economics")
 economics <- tail(economics, 100)
 
 apex(data = economics, type = "line", mapping = aes(x = date, y = uempmed))
-```
 
-
-To represent several lines, use a `data.frame` in long format and the `group` aesthetic:
-
-```{r lines}
+## ----lines--------------------------------------------------------------------
 data("economics_long")
 economics_long <- economics_long %>% 
   group_by(variable) %>% 
@@ -86,73 +42,34 @@ economics_long <- economics_long %>%
 
 apex(data = economics_long, type = "line", mapping = aes(x = date, y = value01, group = variable)) %>% 
   ax_yaxis(decimalsInFloat = 2) # number of decimals to keep
-```
 
-
-Create area charts with `type = "area"`:
-
-```{r area}
+## ----area---------------------------------------------------------------------
 apex(data = economics_long, type = "area", mapping = aes(x = date, y = value01, fill = variable)) %>% 
   ax_yaxis(decimalsInFloat = 2) %>% # number of decimals to keep
   ax_chart(stacked = TRUE) %>%
   ax_yaxis(max = 4, tickAmount = 4)
-```
 
-
-
-
-
-## Scatter charts
-
-Simple bar charts can be created with:
-
-```{r scatter}
+## ----scatter------------------------------------------------------------------
 apex(data = mtcars, type = "scatter", mapping = aes(x = wt, y = mpg))
-```
 
-Color points according to a third variable:
+## ----scatter-fill-------------------------------------------------------------
+apex(data = mtcars, type = "scatter", mapping = aes(x = wt, y = mpg, fill = cyl))
 
-```{r scatter-fill}
-apex(data = mtcars, type = "scatter", mapping = aes(x = wt, y = mpg, fill = cyl)) %>%
-  ax_xaxis(tickAmount = 5)
-```
-
-And change point size using `z` aesthetics:
-
-```{r bubbles}
+## ----bubbles------------------------------------------------------------------
 apex(data = mtcars, type = "scatter", mapping = aes(x = wt, y = mpg, z = scales::rescale(qsec)))
-```
 
-
-
-
-## Pie charts
-
-Simple pie charts can be created with:
-
-```{r pie}
+## ----pie----------------------------------------------------------------------
 poll <- data.frame(
   answer = c("Yes", "No"),
   n = c(254, 238)
 )
 
 apex(data = poll, type = "pie", mapping = aes(x = answer, y = n))
-```
 
-
-
-## Radial charts
-
-Simple radial charts can be created with (here we pass values directly in `aes`, but you can use a `data.frame`) :
-
-```{r radial}
+## ----radial-------------------------------------------------------------------
 apex(data = NULL, type = "radialBar", mapping = aes(x = "My value", y = 65))
-```
 
-
-Multi radial chart (more than one value):
-
-```{r radial-mult}
+## ----radial-mult--------------------------------------------------------------
 fruits <- data.frame(
   name = c('Apples', 'Oranges', 'Bananas', 'Berries'),
   value = c(44, 55, 67, 83)
@@ -160,23 +77,13 @@ fruits <- data.frame(
 
 apex(data = fruits, type = "radialBar", mapping = aes(x = name, y = value))
 
-```
 
-
-
-## Radar charts
-
-Simple radar charts can be created with:
-
-```{r radar}
+## ----radar--------------------------------------------------------------------
 mtcars$model <- rownames(mtcars)
 
 apex(data = head(mtcars), type = "radar", mapping = aes(x = model, y = qsec))
-```
 
-With a grouping variable:
-
-```{r radar-mult}
+## ----radar-mult---------------------------------------------------------------
 # extremely complicated reshaping
 new_mtcars <- reshape(
   data = head(mtcars), 
@@ -189,14 +96,8 @@ new_mtcars <- reshape(
 )
 
 apex(data = new_mtcars, type = "radar", mapping = aes(x = model, y = value, group = time))
-```
 
-
-## Heatmap
-
-Create heatmap with : 
-
-```{r heatmap}
+## ----heatmap------------------------------------------------------------------
 txhousing2 <- txhousing %>% 
   filter(city %in% head(unique(city)), year %in% c(2000, 2001)) %>% 
   rename(val_med = median)
@@ -208,7 +109,4 @@ apex(
 ) %>% 
   ax_dataLabels(enabled = FALSE) %>% 
   ax_colors("#008FFB")
-```
-
-
 
