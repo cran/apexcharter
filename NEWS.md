@@ -1,3 +1,27 @@
+apexcharter 0.1.5
+==================
+
+* Updated ApexCharts.js to 3.18.1
+* Support for candlestick charts in `apex()`.
+* `apex()` has a new argument `synchronize` to easily synchronize charts together.
+* `apex()` has new charts type: area-spline, area-step and step.
+
+
+## New functions
+
+* `spark_box` to create boxes with sparkline, see corresponding vignette for more details.
+* `add_shade()`, `add_shade_weekend()`, `add_event()` to add annotations on timeries charts.
+* `add_hline()`, `add_vline()`, `add_point()` to add annotations on charts.
+* `set_tooltip_fixed()` to fix tooltip in specific position.
+
+## Bugfixes
+
+* Xaxis datetime now display properly with columns and bars.
+* Dark mode wasn't activated properly in `ax_theme()`.
+
+
+
+
 apexcharter 0.1.4
 ==================
 

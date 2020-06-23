@@ -132,9 +132,12 @@ ax_annotations <- function(ax,
 #' @param stacked Logical. Enables stacked option for axis charts. 
 #' @param stackType When stacked, should the stacking be percentage based or normal stacking.
 #'  Available options: \code{"normal"} or \code{"100\%"}.
-#' @param defaultLocale Locale to use : \code{"ca"}, \code{"de"}, \code{"el"}, \code{"en"}, \code{"es"}, \code{"fi"}, \code{"fr"},
-#'  \code{"hi"}, \code{"hr"}, \code{"hy"}, \code{"id"}, \code{"it"}, \code{"ko"}, \code{"nl"}, \code{"pt-br"}, 
-#'  \code{"ru"}, \code{"se"}, \code{"tr"}, \code{"ua"}.
+#' @param defaultLocale Locale to use : \code{"ca"}, \code{"cs"}, \code{"de"},
+#'  \code{"el"}, \code{"en"}, \code{"es"}, \code{"fi"}, \code{"fr"}, \code{"he"}, 
+#'  \code{"hi"}, \code{"hr"}, \code{"hy"}, \code{"id"}, \code{"it"}, \code{"ko"}, 
+#'  \code{"lt"}, \code{"nb"}, \code{"nl"}, \code{"pl"}, \code{"pt-br"}, \code{"pt"}, 
+#'  \code{"ru"}, \code{"se"}, \code{"sk"}, \code{"sl"}, \code{"th"}, \code{"tr"}, 
+#'  \code{"ua"}.
 #' @param locales Array of custom locales parameters.
 #' @param animations A list of parameters.
 #' @param background Background color for the chart area. If you want to set background with css, use \code{.apexcharts-canvas} to set it.
@@ -188,6 +191,7 @@ ax_chart <- function(ax,
 #' @param heatmap See \code{\link{heatmap_opts}}.
 #' @param radialBar See \code{\link{radialBar_opts}}.
 #' @param pie See \code{\link{pie_opts}}.
+#' @param bubble See \code{\link{bubble_opts}}.
 #' @param ... Additional parameters.
 #'
 #' @return A \code{apexcharts} \code{htmlwidget} object.
@@ -232,6 +236,7 @@ ax_plotOptions <- function(ax,
                            heatmap = NULL,
                            radialBar = NULL,
                            pie = NULL,
+                           bubble = NULL,
                            ...) {
   params <- c(as.list(environment()), list(...))[-1]
   .ax_opt2(ax, "plotOptions", l = dropNulls(params))
@@ -1157,19 +1162,7 @@ ax_yaxis <- function(ax,
 #' @return A \code{apexcharts} \code{htmlwidget} object.
 #' @export
 #'
-#' @examples
-#' 
-#' library(dplyr)
-#' data("economics_long", package = "ggplot2")
-#' 
-#' eco <- economics_long %>% 
-#'   filter(variable %in% c("pce", "pop")) %>% 
-#'   filter(date >= "2000-01-01")
-#' 
-#' apex(eco, aes(x = date, y = value, color = variable), type = "line") %>% 
-#'   ax_yaxis(title = list(text = "Pce")) %>% 
-#'   ax_yaxis2(opposite = TRUE, title = list(text = "Pop"))
-#'   
+#' @example examples/ax_yaxis2.R 
 ax_yaxis2 <- function(ax, ...) {
   params <- dropNulls(list(...))
   yaxis <- .get_ax_opt(ax, "yaxis")
@@ -1188,13 +1181,13 @@ ax_yaxis2 <- function(ax, ...) {
 
 #' Theme for charts
 #'
-#' @param ax A \code{apexcharts} \code{htmlwidget} object. 
+#' @param ax An \code{apexcharts} \code{htmlwidget} object. 
 #' @param mode use light or dark theme.
 #' @param palette Character. Available palettes: \code{"palette1"} to \code{"palette10"}.
 #' @param monochrome A list of parameters.
 #' @param ... Additional parameters.
 #'
-#' @return A \code{apexcharts} \code{htmlwidget} object.
+#' @return An \code{apexcharts} \code{htmlwidget} object.
 #' @export
 #'
 #' @note See \url{https://apexcharts.com/docs/options/theme/}
@@ -1234,6 +1227,71 @@ ax_theme <- function(ax,
     mode = mode,
     palette = palette,
     monochrome = monochrome
-  ), list(...))[-1]
+  ), list(...))
   .ax_opt2(ax, "theme", l = dropNulls(params))
 }
+
+
+
+
+
+
+#' Configuration for charts with no data
+#'
+#' @param ax An \code{apexcharts} \code{htmlwidget} object. 
+#' @param text The text to display when no-data is available.
+#' @param align Horizontal alignment: \code{"left"}, \code{"center"} or \code{"right"}.
+#' @param verticalAlign Vertical alignment: \code{"top"}, \code{"middle"} or \code{"bottom"}.
+#' @param color ForeColor of the text.
+#' @param fontSize FontSize of the text.
+#' @param fontFamily FontFamily of the text.
+#' @param offsetX,offsetY Text offset.
+#'
+#' @return An \code{apexcharts} \code{htmlwidget} object.
+#' @export
+#'
+#' @examples
+#' empty <- data.frame(
+#'   var1 = character(0),
+#'   var2 = numeric(0)
+#' )
+#' apex(empty, aes(var1, var2), "column") %>% 
+#'   ax_nodata(
+#'     text = "Sorry no data to visualize",
+#'     fontSize = "30px"
+#'   )
+ax_nodata <- function(ax, 
+                      text = "No data", 
+                      align = "center", 
+                      verticalAlign = "middle",
+                      color = NULL, 
+                      fontSize = NULL, 
+                      fontFamily = NULL,
+                      offsetX = NULL,
+                      offsetY = NULL) {
+  params <- list(
+    text = text,
+    align = align,
+    verticalAlign = verticalAlign,
+    offsetX = offsetX,
+    offsetY = offsetY,
+    style = dropNulls(list(
+      color = color,
+      fontSize = fontSize,
+      fontFamily = fontFamily
+    ))
+  )
+  .ax_opt2(ax, "noData", l = dropNulls(params))
+}
+
+
+
+
+
+
+
+
+
+
+
+

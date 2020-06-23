@@ -23,7 +23,8 @@ apexchart <- function(ax_opts = list(), auto_update = TRUE, width = NULL, height
 
   x <- list(
     ax_opts = ax_opts,
-    auto_update = auto_update
+    auto_update = auto_update,
+    sparkbox = FALSE
   )
 
   # create widget
@@ -57,8 +58,9 @@ add_locale_apex <- function(widget) {
     defaultLocale <- widget$x$ax_opts$chart$defaultLocale
     defaultLocale <- match.arg(
       arg = defaultLocale,
-      choices = c("ca", "de", "el", "en", "es", "fi", "fr", "hi", "hr", "hy",
-                  "id", "it", "ko", "nl", "pt-br", "ru", "se", "tr", "ua")
+      choices = c("ca", "cs", "de", "el", "en", "es", "fi", "fr", "he", "hi", 
+                  "hr", "hy", "id", "it", "ko", "lt", "nb", "nl", "pl", "pt-br", 
+                  "pt", "ru", "se", "sk", "sl", "th", "tr", "ua")
     )
     if (!is.null(widget$x$ax_opts$chart$locales)) {
       warning(
@@ -87,18 +89,22 @@ add_locale_apex <- function(widget) {
 #' @param options_redrawPaths When the chart is re-rendered,
 #'  should it draw from the existing paths or completely redraw 
 #'  the chart paths from the beginning. By default, the chart 
-#'  is re-rendered from the existing paths 
+#'  is re-rendered from the existing paths.
+#' @param update_synced_charts All the charts in a group should
+#'  also update when one chart in a group is updated.
 #' 
 #' @export
 config_update <- function(series_animate = TRUE, 
                           update_options = FALSE, 
                           options_animate = TRUE, 
-                          options_redrawPaths = FALSE) {
+                          options_redrawPaths = TRUE,
+                          update_synced_charts = FALSE) {
   list(
     series_animate = series_animate, 
     update_options = update_options, 
     options_animate = options_animate, 
-    options_redrawPaths = options_redrawPaths
+    options_redrawPaths = options_redrawPaths,
+    update_synced_charts = update_synced_charts
   )
 }
 

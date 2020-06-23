@@ -10,6 +10,7 @@ apex(
   type = "column",
   ...,
   auto_update = TRUE,
+  synchronize = NULL,
   serie_name = NULL,
   width = NULL,
   height = NULL,
@@ -23,8 +24,10 @@ a \code{data.frame}, it will be coerced to with \code{as.data.frame}.}
 \item{mapping}{Default list of aesthetic mappings to use for chart}
 
 \item{type}{Specify the chart type. Available options:
-\code{"column"}, \code{"bar"}, \code{"line"},
-\code{"area"}, \code{"spline"}, \code{"pie"}, \code{"donut"},
+\code{"column"}, \code{"bar"},
+\code{"line"}, \code{"step"}, \code{"spline"},
+\code{"area"}, \code{"area-step"}, \code{"area-spline"},
+\code{"pie"}, \code{"donut"},
 \code{"radialBar"}, \code{"radar"}, \code{"scatter"}, \code{"heatmap"},
 \code{"timeline"}.}
 
@@ -33,6 +36,8 @@ a \code{data.frame}, it will be coerced to with \code{as.data.frame}.}
 \item{auto_update}{In Shiny application, update existing chart
 rather than generating new one. Can be \code{TRUE}/\code{FALSE} or
 use \code{\link{config_update}} for more control.}
+
+\item{synchronize}{Give a common id to charts to synchronize them (tooltip and zoom).}
 
 \item{serie_name}{Name for the serie displayed in tooltip,
 only used for single serie.}

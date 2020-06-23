@@ -8,14 +8,17 @@
 #'  a \code{data.frame}, it will be coerced to with \code{as.data.frame}.
 #' @param mapping Default list of aesthetic mappings to use for chart
 #' @param type Specify the chart type. Available options:
-#'  \code{"column"}, \code{"bar"}, \code{"line"},
-#'  \code{"area"}, \code{"spline"}, \code{"pie"}, \code{"donut"},
+#'  \code{"column"}, \code{"bar"}, 
+#'  \code{"line"}, \code{"step"}, \code{"spline"},
+#'  \code{"area"}, \code{"area-step"}, \code{"area-spline"}, 
+#'  \code{"pie"}, \code{"donut"},
 #'  \code{"radialBar"}, \code{"radar"}, \code{"scatter"}, \code{"heatmap"}, 
 #'  \code{"timeline"}.
 #' @param ... Other arguments passed on to methods. Not currently used.
 #' @param auto_update In Shiny application, update existing chart
 #'  rather than generating new one. Can be \code{TRUE}/\code{FALSE} or
 #'  use \code{\link{config_update}} for more control.
+#' @param synchronize Give a common id to charts to synchronize them (tooltip and zoom).
 #' @param serie_name Name for the serie displayed in tooltip,
 #'  only used for single serie.
 #' @param width A numeric input in pixels.
@@ -32,14 +35,19 @@
 #' @example examples/apex.R
 apex <- function(data, mapping, type = "column", ..., 
                  auto_update = TRUE,
+                 synchronize = NULL,
                  serie_name = NULL,
-                 width = NULL, height = NULL, elementId = NULL) {
+                 width = NULL,
+                 height = NULL, 
+                 elementId = NULL) {
   type <- match.arg(
     arg = type, 
     choices = c(
-      "column", "bar", "line", "area", "spline", "area-spline",
-      "pie", "donut", "radialBar", "radar", "scatter", "heatmap",
-      "timeline"
+      "column", "bar", "line", "area", "spline", "step", 
+      "area-spline", "area-step",
+      "pie", "donut", "radialBar", "radar", 
+      "scatter", "heatmap",
+      "timeline", "candlestick"
     )
   )
   data <- as.data.frame(data)
@@ -58,25 +66,50 @@ apex <- function(data, mapping, type = "column", ...,
     )
   } else {
     opts <- list(
-      chart = list(type = correct_type(type)),
+      chart = dropNulls(list(
+        type = correct_type(type), 
+        group = synchronize
+      )),
       series = make_series(mapdata, mapping, type, serie_name)
     )
   }
+  if (!is.null(synchronize)) {
+    opts$yaxis$labels$minWidth <- 15
+  }
   opts <- modifyList(opts, choose_config(type, mapdata))
-  apexchart(
+  if (isTRUE(getOption("apex.axis.light", default = TRUE))) {
+    opts$yaxis$labels$style$colors <- "#848484"
+    opts$xaxis$labels$style$colors <- "#848484"
+  }
+  ax <- apexchart(
     ax_opts = opts, 
-    width = width, height = height,
+    width = width, 
+    height = height,
     elementId = elementId, 
     auto_update = auto_update
   )
+  if (inherits(mapdata$x, c("character", "Date", "POSIXt", "numeric", "integer")) & length(mapdata$x) > 0) {
+    ax$x$xaxis <- list(
+      min = min(mapdata$x, na.rm = TRUE),
+      max = max(mapdata$x, na.rm = TRUE)
+    )
+  }
+  return(ax)
 }
 
 
 # Construct series
 make_series <- function(mapdata, mapping, type = NULL, serie_name = NULL) {
-  if (identical(type, "timeline")) {
+  if (identical(type, "candlestick")) {
+    if (!all(c("x", "open", "high", "low", "close") %in% names(mapping)))
+      stop("For candlestick charts 'x', 'open', 'high', 'low', and 'close' aesthetics must be provided.", call. = FALSE)
+    if (!is.null(mapdata$group))
+      warning("'group' aesthetic in candlestick chart is not supported", call. = FALSE)
+    mapdata$group <- NULL
+    series <- parse_candlestick_data(mapdata)
+  } else if (identical(type, "rangeBar")) {
     if (!all(c("x", "start", "end") %in% names(mapping)))
-      stop("For timeline charts 'x', 'start', and 'end' aesthetice must be provided.", call. = FALSE)
+      stop("For timeline charts 'x', 'start', and 'end' aesthetics must be provided.", call. = FALSE)
     if (is.null(mapdata$group))
       mapdata$group <- serie_name %||% rlang::as_label(mapping$x)
     series <- parse_timeline_data(mapdata)
@@ -87,19 +120,21 @@ make_series <- function(mapdata, mapping, type = NULL, serie_name = NULL) {
     x_order <- unique(mapdata$x)
     if (is_x_datetime(mapdata)) {
       add_names <- FALSE
+      x_order <- sort(x_order)
     } else {
       add_names <- names(mapping)
     }
     if (is.null(serie_name) & !is.null(mapping$y))
       serie_name <- rlang::as_label(mapping$y)
-    series <- list(list(
+    series <- list(dropNulls(list(
       name = serie_name,
+      type = multi_type(type),
       data = parse_df(mapdata, add_names = add_names)
-    ))
+    )))
     if (is_grouped(mapping)) {
       mapdata <- rename_aes(mapdata)
       len_grp <- tapply(mapdata$group, mapdata$group, length)
-      if (length(unique(len_grp)) > 1) {
+      if (length(unique(len_grp)) > 1 & !isTRUE(type %in% c("scatter", "bubble"))) {
         warning("apex: all groups must have same length! You can use `tidyr::complete` for this.")
       }
       series <- lapply(
@@ -108,13 +143,14 @@ make_series <- function(mapdata, mapping, type = NULL, serie_name = NULL) {
           data <- mapdata[mapdata$group %in% x, ]
           data <- data[, setdiff(names(data), "group"), drop = FALSE]
           data <- data[match(x = x_order, table = data$x, nomatch = 0L), , drop = FALSE]
-          list(
+          dropNulls(list(
             name = x,
+            type = multi_type(type),
             data = parse_df(
               data = data, 
               add_names = add_names
             )
-          )
+          ))
         }
       )
     }
@@ -173,8 +209,10 @@ list1 <- function(x) {
 correct_type <- function(type) {
   if (identical(type, "column")) {
     "bar"
-  } else if (identical(type, "spline")) {
+  } else if (isTRUE(type %in% c("spline", "step"))) {
     "line"
+  } else if (isTRUE(type %in% c("area-spline", "area-step"))) {
+    "area"
   } else if (identical(type, "timeline")) {
     "rangeBar"
   } else {
@@ -182,8 +220,19 @@ correct_type <- function(type) {
   }
 }
 
+multi_type <- function(x) {
+  multis <- c("column", "area", "line", 
+              "spline", "step", "scatter", 
+              "bubble")
+  if (isTRUE(x %in% multis)) {
+    correct_type(x)
+  } else {
+    NULL
+  }
+}
+
 range_num <- function(x) {
-  if (is.numeric(x)) {
+  if (is.numeric(x) & length(x) > 0) {
     range(pretty(x))
   } else {
     NULL
@@ -201,26 +250,34 @@ choose_config <- function(type, mapdata) {
   switch(
     type, 
     "bar" = config_bar(horizontal = TRUE),
-    "column" = config_bar(horizontal = FALSE),
+    "column" = config_bar(horizontal = FALSE, datetime = datetime),
     "line" = config_line(datetime = datetime),
     "area" = config_line(datetime = datetime),
     "spline" = config_line(curve = "smooth", datetime = datetime),
-    "scatter" = config_scatter(range_x = range_x, range_y = range_y),
-    "bubble" = config_scatter(range_x = range_x, range_y = range_y),
+    "step" = config_line(curve = "stepline", datetime = datetime),
+    "area-spline" = config_line(curve = "smooth", datetime = datetime),
+    "area-step" = config_line(curve = "stepline", datetime = datetime),
+    "scatter" = config_scatter(range_x = range_x, range_y = range_y, datetime = datetime),
+    "bubble" = config_scatter(range_x = range_x, range_y = range_y, datetime = datetime),
     "timeline" = config_timeline(),
+    "candlestick" = config_candlestick(),
     list()
   )
 }
 
 
 # Config for column & bar charts
-config_bar <- function(horizontal = FALSE) {
+config_bar <- function(horizontal = FALSE, datetime = FALSE) {
   config <- list(
     dataLabels = list(enabled = FALSE),
     plotOptions = list(
       bar = list(
         horizontal = horizontal
       )
+    ),
+    tooltip = list(
+      shared = TRUE, 
+      followCursor = TRUE
     )
   )
   if (isTRUE(horizontal)) {
@@ -230,6 +287,9 @@ config_bar <- function(horizontal = FALSE) {
         xaxis = list(lines = list(show = TRUE))
       )
     ))
+  }
+  if (isTRUE(datetime)) {
+    config$xaxis$type <- "datetime"
   }
   config
 }
@@ -241,6 +301,9 @@ config_line <- function(curve = "straight", datetime = FALSE) {
     stroke = list(
       curve = curve,
       width = 2
+    ), 
+    yaxis = list(
+      decimalsInFloat = 2
     )
   )
   if (isTRUE(datetime)) {
@@ -252,15 +315,25 @@ config_line <- function(curve = "straight", datetime = FALSE) {
 }
 
 
-config_scatter <- function(range_x, range_y) {
+config_scatter <- function(range_x, range_y, datetime = FALSE) {
   config <- list(
     dataLabels = list(enabled = FALSE),
     xaxis = list(
       type = "numeric",
-      min = range_x[1], max = range_x[2]
+      min = range_x[1], 
+      max = range_x[2],
+      crosshairs = list(
+        show = TRUE,
+        stroke = list(dashArray = 0)
+      )
     ),
     yaxis = list(
-      min = range_y[1], max = range_y[2]
+      min = range_y[1], 
+      max = range_y[2],
+      decimalsInFloat = 3,
+      tooltip = list(
+        enabled = TRUE
+      )
     ),
     grid = list(
       xaxis = list(
@@ -270,6 +343,10 @@ config_scatter <- function(range_x, range_y) {
       )
     )
   )
+  if (isTRUE(datetime)) {
+    config$xaxis$type <- "datetime"
+  }
+  config
 }
 
 config_timeline <- function() {
@@ -279,6 +356,14 @@ config_timeline <- function() {
         horizontal = TRUE
       )
     ),
+    xaxis = list(
+      type = "datetime"
+    )
+  )
+}
+
+config_candlestick <- function() {
+  list(
     xaxis = list(
       type = "datetime"
     )

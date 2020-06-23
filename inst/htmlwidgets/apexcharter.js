@@ -125,6 +125,11 @@ HTMLWidgets.widget({
       renderValue: function(x) {
         // Global options
         axOpts = x.ax_opts;
+        
+        if (x.sparkbox) {
+          el.style.background = x.sparkbox.background;
+          el.classList.add("apexcharter-spark-box");
+        }
 
         // Sizing
         if (typeof axOpts.chart === "undefined") {
@@ -132,8 +137,26 @@ HTMLWidgets.widget({
         }
         axOpts.chart.width = width;
         axOpts.chart.height = height;
+        if (!axOpts.chart.hasOwnProperty("id")) {
+          axOpts.chart.id = el.id;
+        }
         if (!axOpts.chart.hasOwnProperty("parentHeightOffset")) {
           axOpts.chart.parentHeightOffset = 0;
+        }
+        
+        // added events to remove minheight container
+        if (!axOpts.chart.hasOwnProperty("events")) {
+          axOpts.chart.events = {};
+        }
+        if (!axOpts.chart.events.hasOwnProperty("mounted")) {
+          axOpts.chart.events.mounted = function(chartContext, config) {
+            el.style.minHeight = 0;
+          };
+        }
+        if (!axOpts.chart.events.hasOwnProperty("updated")) {
+          axOpts.chart.events.updated = function(chartContext, config) {
+            el.style.minHeight = 0;
+          };
         }
 
         if (x.hasOwnProperty("shinyEvents") & HTMLWidgets.shinyMode) {
@@ -226,12 +249,17 @@ HTMLWidgets.widget({
           apexchart.render();
         } else {
           if (x.auto_update) {
+            //console.log(x.auto_update);
             apexchart.updateSeries(axOpts.series, x.auto_update.series_animate);
             if (x.auto_update.update_options) {
+              delete axOpts.series;
+              delete axOpts.chart.width;
+              delete axOpts.chart.height;
               apexchart.updateOptions(
                 axOpts,
                 x.auto_update.options_redrawPaths,
-                x.auto_update.options_animate
+                x.auto_update.options_animate,
+                x.auto_update.update_synced_charts
               );
             }
           } else {

@@ -174,6 +174,8 @@ set_input_selection <- function(ax, inputId, type = c("x", "xy", "y"),
 #' @param example Name of the example.
 #'
 #' @export
+#' 
+#' @importFrom shiny shinyAppFile
 #'
 #' @examples
 #' if (interactive()) {
@@ -194,6 +196,42 @@ run_input_demo <- function(example = c("click", "zoom", "selection")) {
 
 
 
+#' Run Shiny synchronization example
+#'
+#' @export
+#' 
+#' @importFrom shiny shinyAppFile
+#'
+#' @examples
+#' if (interactive()) {
+#' 
+#'   run_sync_demo()
+#' 
+#' }
+run_sync_demo <- function() {
+  shiny::shinyAppFile(
+    appFile = system.file("example-sync", "app.R", package = "apexcharter"),
+    options = list("display.mode" = "showcase")
+  )
+}
 
 
+#' Run Shiny spark boxes example
+#'
+#' @export
+#' 
+#' @importFrom shiny shinyAppFile
+#'
+#' @examples
+#' if (interactive()) {
+#' 
+#'   run_sparkbox_demo()
+#' 
+#' }
+run_sparkbox_demo <- function() {
+  shiny::shinyAppFile(
+    appFile = system.file("example-spark", "app.R", package = "apexcharter"),
+    options = list("display.mode" = "showcase")
+  )
+}
 

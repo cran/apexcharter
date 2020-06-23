@@ -12,59 +12,34 @@ data("economics", package = "ggplot2")
 #  apex(
 #    data = tail(economics, 150),
 #    mapping = aes(x = date, y = pce),
-#    type = "line"
-#  ) %>%
-#    ax_chart(
-#      group = "economics", id = "pce" # <- define common group and unique id
-#    ) %>%
-#    ax_yaxis(
-#      labels = list(
-#        minWidth = 15
-#      )
-#    )
+#    type = "line",
+#    synchronize = "economics"
+#  )
 #  
 #  apex(
 #    data = tail(economics, 150),
 #    mapping = aes(x = date, y = psavert),
-#    type = "line"
-#  ) %>%
-#    ax_chart(
-#      group = "economics", id = "psavert" # <- define common group and unique id
-#    ) %>%
-#    ax_yaxis(
-#      labels = list(
-#        minWidth = 15
-#      )
-#    )
+#    type = "line",
+#    synchronize = "economics"
+#  )
 
 ## ----run-example-1, echo=FALSE, ref.label="example-1"-------------------------
 apex(
   data = tail(economics, 150), 
   mapping = aes(x = date, y = pce),
-  type = "line"
-) %>% 
-  ax_chart(
-    group = "economics", id = "pce" # <- define common group and unique id
-  ) %>% 
-  ax_yaxis(
-    labels = list(
-      minWidth = 15
-    )
-  )
+  type = "line", 
+  synchronize = "economics"
+)
 
 apex(
   data = tail(economics, 150), 
   mapping = aes(x = date, y = psavert),
-  type = "line"
-) %>% 
-  ax_chart(
-    group = "economics", id = "psavert" # <- define common group and unique id
-  ) %>% 
-  ax_yaxis(
-    labels = list(
-      minWidth = 15
-    )
-  )
+  type = "line", 
+  synchronize = "economics"
+)
+
+## ----shiny-example, eval=FALSE------------------------------------------------
+#  run_sync_demo()
 
 ## ----example-2, eval=FALSE----------------------------------------------------
 #  apex(

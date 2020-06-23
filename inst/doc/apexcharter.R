@@ -110,3 +110,10 @@ apex(
   ax_dataLabels(enabled = FALSE) %>% 
   ax_colors("#008FFB")
 
+## -----------------------------------------------------------------------------
+apex(
+  candles, 
+  aes(x = datetime, open = open, close = close, low = low, high = high),
+  type = "candlestick"
+)
+

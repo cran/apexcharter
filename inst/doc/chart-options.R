@@ -8,7 +8,69 @@ knitr::opts_chunk$set(
 library(apexcharter)
 library(dplyr)
 
-# economics dataset from ggplot2
+data("diamonds", package = "ggplot2")
+n_cut <- count(diamonds, cut)
+
+## -----------------------------------------------------------------------------
+apex(data = n_cut, type = "column", mapping = aes(x = cut, y = n)) %>%
+  ax_labs(
+    title = "Cut distribution",
+    subtitle = "Data from ggplot2",
+    x = "Cut",
+    y = "Count"
+  )
+
+## -----------------------------------------------------------------------------
+apex(data = n_cut, type = "column", mapping = aes(x = cut, y = n)) %>% 
+  ax_title(text = "Cut distribution")
+
+## -----------------------------------------------------------------------------
+apex(data = n_cut, type = "column", mapping = aes(x = cut, y = n)) %>% 
+  ax_title(
+    text = "Cut distribution", 
+    align = "center",
+    style = list(fontSize = "22px", fontWeight = 700)
+  )
+
+## -----------------------------------------------------------------------------
+apex(data = n_cut, type = "column", mapping = aes(x = cut, y = n)) %>% 
+  ax_title(text = "Cut distribution") %>% 
+  ax_subtitle(text = "Data from ggplot2")
+
+## -----------------------------------------------------------------------------
+apex(data = n_cut, type = "column", mapping = aes(x = cut, y = n)) %>% 
+  ax_title(
+    text = "Cut distribution", 
+    align = "center",
+    style = list(fontSize = "22px", fontWeight = 700)
+  ) %>% 
+  ax_subtitle(
+    text = "Data from ggplot2", 
+    align = "center",
+    style = list(fontSize = "16px", fontWeight = 400, color = "#BDBDBD")
+  )
+
+## -----------------------------------------------------------------------------
+apex(data = n_cut, type = "column", mapping = aes(x = cut, y = n)) %>% 
+  ax_yaxis(title = list(text = "Count")) %>% 
+  ax_xaxis(title = list(text = "Cut"))
+
+## -----------------------------------------------------------------------------
+apex(data = n_cut, type = "column", mapping = aes(x = cut, y = n)) %>% 
+  ax_yaxis(title = list(
+    text = "Count",
+    style = list(fontSize = "14px", color = "#BDBDBD")
+  )) %>% 
+  ax_xaxis(title = list(
+    text = "Cut", 
+    style = list(fontSize = "14px", color = "#BDBDBD")
+  ))
+
+## ----message=FALSE, warning=FALSE---------------------------------------------
+library(apexcharter)
+library(dplyr)
+
+## economics dataset from ggplot2
 data("economics", package = "ggplot2")
 economics <- tail(economics, 50)
 
