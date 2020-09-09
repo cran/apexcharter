@@ -35,7 +35,11 @@ apexchart <- function(ax_opts = list(), auto_update = TRUE, width = NULL, height
     height = height,
     package = "apexcharter",
     elementId = elementId,
-    preRenderHook = add_locale_apex,
+    preRenderHook = function(widget) {
+      widget$x$data <- NULL
+      widget$x$mapping <- NULL
+      add_locale_apex(widget)
+    },
     sizingPolicy = htmlwidgets::sizingPolicy(
       defaultWidth = "100%",
       defaultHeight = "100%",
