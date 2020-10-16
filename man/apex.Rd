@@ -2,7 +2,7 @@
 % Please edit documentation in R/apex.R
 \name{apex}
 \alias{apex}
-\title{Quick ApexChart}
+\title{Quick ApexCharts}
 \usage{
 apex(
   data,
@@ -28,7 +28,8 @@ a \code{data.frame}, it will be coerced to with \code{as.data.frame}.}
 \code{"line"}, \code{"step"}, \code{"spline"},
 \code{"area"}, \code{"area-step"}, \code{"area-spline"},
 \code{"pie"}, \code{"donut"},
-\code{"radialBar"}, \code{"radar"}, \code{"scatter"}, \code{"heatmap"},
+\code{"radialBar"}, \code{"radar"}, \code{"scatter"},
+\code{"heatmap"}, \code{"treemap"},
 \code{"timeline"}.}
 
 \item{...}{Other arguments passed on to methods. Not currently used.}

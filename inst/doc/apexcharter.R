@@ -97,6 +97,14 @@ new_mtcars <- reshape(
 
 apex(data = new_mtcars, type = "radar", mapping = aes(x = model, y = value, group = time))
 
+## -----------------------------------------------------------------------------
+apex(mtcars, aes(rownames(mtcars), mpg), type = "polarArea") %>% 
+  ax_legend(show = FALSE) %>% 
+  ax_colors(col_numeric("Blues", domain = NULL)(mtcars$mpg)) %>% 
+  ax_fill(opacity = 1) %>% 
+  ax_stroke(width = 0) %>% 
+  ax_tooltip(fillSeriesColor = FALSE)
+
 ## ----heatmap------------------------------------------------------------------
 txhousing2 <- txhousing %>% 
   filter(city %in% head(unique(city)), year %in% c(2000, 2001)) %>% 
@@ -110,7 +118,14 @@ apex(
   ax_dataLabels(enabled = FALSE) %>% 
   ax_colors("#008FFB")
 
+## ----treemap------------------------------------------------------------------
+data("mpg", package = "ggplot2")
+n_manufac <- dplyr::count(mpg, manufacturer)
+
+apex(n_manufac, aes(x = manufacturer, y = n), "treemap")
+
 ## -----------------------------------------------------------------------------
+data("candles", package = "apexcharter")
 apex(
   candles, 
   aes(x = datetime, open = open, close = close, low = low, high = high),
