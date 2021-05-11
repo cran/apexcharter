@@ -1,3 +1,12 @@
+apexcharter 0.2.0
+==================
+
+* Updated ApexCharts.js to 3.26.2
+* New functions `ax_facet_wrap()` and `ax_facet_grid()` to create faceting charts.
+* New function `apex_grid()` to combine several charts in a grid.
+
+
+
 apexcharter 0.1.8
 ==================
 
@@ -41,7 +50,7 @@ apexcharter 0.1.5
 ## New functions
 
 * `spark_box` to create boxes with sparkline, see corresponding vignette for more details.
-* `add_shade()`, `add_shade_weekend()`, `add_event()` to add annotations on timeries charts.
+* `add_shade()`, `add_shade_weekend()`, `add_event()` to add annotations on time-series charts.
 * `add_hline()`, `add_vline()`, `add_point()` to add annotations on charts.
 * `set_tooltip_fixed()` to fix tooltip in specific position.
 

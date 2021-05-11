@@ -56,6 +56,7 @@ apexchart <- function(ax_opts = list(), auto_update = TRUE, width = NULL, height
   )
 }
 
+# dput(tools::file_path_sans_ext(list.files("inst/htmlwidgets/assets/apexcharts-locales/")))
 #' @importFrom jsonlite fromJSON
 add_locale_apex <- function(widget) {
   if (!is.null(widget$x$ax_opts$chart$defaultLocale)) {
@@ -63,8 +64,9 @@ add_locale_apex <- function(widget) {
     defaultLocale <- match.arg(
       arg = defaultLocale,
       choices = c("ca", "cs", "de", "el", "en", "es", "fi", "fr", "he", "hi", 
-                  "hr", "hy", "id", "it", "ko", "lt", "nb", "nl", "pl", "pt-br", 
-                  "pt", "ru", "se", "sk", "sl", "th", "tr", "ua")
+                  "hr", "hu", "hy", "id", "it", "ja", "ka", "ko", "lt", "nb", "nl", 
+                  "pl", "pt-br", "pt", "rs", "ru", "se", "sk", "sl", "sq", "th", 
+                  "tr", "ua", "zh-cn")
     )
     if (!is.null(widget$x$ax_opts$chart$locales)) {
       warning(
@@ -73,7 +75,7 @@ add_locale_apex <- function(widget) {
       )
     } else {
       path <- system.file(
-        file.path("htmlwidgets/lib/apexcharts-locales", paste0(defaultLocale, ".json")),
+        file.path("htmlwidgets/assets/apexcharts-locales", paste0(defaultLocale, ".json")),
         package = "apexcharter"
       )
       locale <- jsonlite::fromJSON(txt = path)
@@ -136,13 +138,13 @@ config_update <- function(series_animate = TRUE,
 #' @importFrom htmlwidgets shinyWidgetOutput shinyRenderWidget
 #' 
 #' @example examples/apexcharter-shiny.R
-apexchartOutput <- function(outputId, width = "100%", height = "400px"){
+apexchartOutput <- function(outputId, width = "100%", height = "400px") { # nocov start
   htmlwidgets::shinyWidgetOutput(outputId, "apexcharter", width, height, package = "apexcharter")
-}
+} # nocov end
 
 #' @rdname apexcharter-shiny
 #' @export
-renderApexchart <- function(expr, env = parent.frame(), quoted = FALSE) {
+renderApexchart <- function(expr, env = parent.frame(), quoted = FALSE) { # nocov start
   if (!quoted) { expr <- substitute(expr) } # force quoted
   htmlwidgets::shinyRenderWidget(expr, apexchartOutput, env, quoted = TRUE)
-}
+} # nocov end

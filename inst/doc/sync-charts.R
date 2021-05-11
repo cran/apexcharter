@@ -1,4 +1,5 @@
 ## ---- include = FALSE---------------------------------------------------------
+options(rmarkdown.html_vignette.check_title = FALSE)
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -14,14 +15,30 @@ data("economics", package = "ggplot2")
 #    mapping = aes(x = date, y = pce),
 #    type = "line",
 #    synchronize = "economics"
-#  )
+#  ) %>%
+#    ax_yaxis(
+#      decimalsInFloat = 0,
+#      labels = list(
+#        formatter = format_num("~s"),
+#        minWidth = 40
+#      )
+#    ) %>%
+#    ax_tooltip(x = list(format = "yyyy"))
 #  
 #  apex(
 #    data = tail(economics, 150),
 #    mapping = aes(x = date, y = psavert),
 #    type = "line",
 #    synchronize = "economics"
-#  )
+#  ) %>%
+#    ax_yaxis(
+#      decimalsInFloat = 0,
+#      labels = list(
+#        formatter = format_num("~s"),
+#        minWidth = 40
+#      )
+#    ) %>%
+#    ax_tooltip(x = list(format = "yyyy"))
 
 ## ----run-example-1, echo=FALSE, ref.label="example-1"-------------------------
 apex(
@@ -29,14 +46,30 @@ apex(
   mapping = aes(x = date, y = pce),
   type = "line", 
   synchronize = "economics"
-)
+) %>% 
+  ax_yaxis(
+    decimalsInFloat = 0,
+    labels = list(
+      formatter = format_num("~s"),
+      minWidth = 40
+    )
+  ) %>%
+  ax_tooltip(x = list(format = "yyyy"))
 
 apex(
   data = tail(economics, 150), 
   mapping = aes(x = date, y = psavert),
   type = "line", 
   synchronize = "economics"
-)
+) %>% 
+  ax_yaxis(
+    decimalsInFloat = 0,
+    labels = list(
+      formatter = format_num("~s"),
+      minWidth = 40
+    )
+  ) %>%
+  ax_tooltip(x = list(format = "yyyy"))
 
 ## ----shiny-example, eval=FALSE------------------------------------------------
 #  run_sync_demo()

@@ -5,9 +5,8 @@
 <!-- badges: start -->
 [![version](http://www.r-pkg.org/badges/version/apexcharter)](https://CRAN.R-project.org/package=apexcharter)
 [![cran checks](https://cranchecks.info/badges/worst/apexcharter)](https://cranchecks.info/pkgs/apexcharter)
-[![Travis build status](https://travis-ci.org/dreamRs/apexcharter.svg?branch=master)](https://travis-ci.org/dreamRs/apexcharter)
-[![Lifecycle: maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 [![R build status](https://github.com/dreamRs/apexcharter/workflows/R-CMD-check/badge.svg)](https://github.com/dreamRs/apexcharter/actions)
+[![Codecov test coverage](https://codecov.io/gh/dreamRs/apexcharter/branch/master/graph/badge.svg)](https://codecov.io/gh/dreamRs/apexcharter?branch=master)
 <!-- badges: end -->
 
 
@@ -39,11 +38,8 @@ Use `apex` function to quickly create visualizations :
 
 ```r
 library(apexcharter)
-
 data("mpg", package = "ggplot2")
-n_manufac <- dplyr::count(mpg, manufacturer)
-
-apex(data = n_manufac, type = "bar", mapping = aes(x = manufacturer, y = n))
+apex(data = mpg, type = "bar", mapping = aes(manufacturer))
 ```
 ![](man/figures/apex-bar.png)
 
@@ -65,7 +61,6 @@ All methods from ApexCharts are available with function like `ax_*` compatible w
 ```r
 library(apexcharter)
 data(mpg, package = "ggplot2")
-n_manufac <- dplyr::count(mpg, manufacturer)
 
 apexchart() %>% 
   ax_chart(type = "bar") %>% 
@@ -84,10 +79,10 @@ apexchart() %>%
   ) %>% 
   ax_series(list(
     name = "Count",
-    data = n_manufac$n
+    data = tapply(mpg$manufacturer, mpg$manufacturer, length)
   )) %>% 
   ax_colors("#112446") %>% 
-  ax_xaxis(categories = n_manufac$manufacturer) %>% 
+  ax_xaxis(categories = unique(mpg$manufacturer)) %>% 
   ax_title(text = "Number of models") %>% 
   ax_subtitle(text = "Data from ggplot2")
 ```

@@ -1,6 +1,6 @@
 
 #' @title Quick ApexCharts
-#' 
+#'
 #' @description Initialize a chart with three main parameters :
 #'  data, mapping and type of chart.
 #'
@@ -8,12 +8,12 @@
 #'  a \code{data.frame}, it will be coerced to with \code{as.data.frame}.
 #' @param mapping Default list of aesthetic mappings to use for chart
 #' @param type Specify the chart type. Available options:
-#'  \code{"column"}, \code{"bar"}, 
+#'  \code{"column"}, \code{"bar"},
 #'  \code{"line"}, \code{"step"}, \code{"spline"},
-#'  \code{"area"}, \code{"area-step"}, \code{"area-spline"}, 
+#'  \code{"area"}, \code{"area-step"}, \code{"area-spline"},
 #'  \code{"pie"}, \code{"donut"},
 #'  \code{"radialBar"}, \code{"radar"}, \code{"scatter"},
-#'  \code{"heatmap"}, \code{"treemap"}, 
+#'  \code{"heatmap"}, \code{"treemap"},
 #'  \code{"timeline"}.
 #' @param ... Other arguments passed on to methods. Not currently used.
 #' @param auto_update In Shiny application, update existing chart
@@ -25,34 +25,34 @@
 #' @param width A numeric input in pixels.
 #' @param height A numeric input in pixels.
 #' @param elementId Use an explicit element ID for the widget.
-#' 
+#'
 #' @return A \code{apexcharts} \code{htmlwidget} object.
 #'
 #' @export
-#' 
+#'
 #' @importFrom rlang eval_tidy as_label
 #' @importFrom utils modifyList
 #' @importFrom stats complete.cases
 #'
 #' @example examples/apex.R
-apex <- function(data, mapping, type = "column", ..., 
+apex <- function(data, mapping, type = "column", ...,
                  auto_update = TRUE,
                  synchronize = NULL,
                  serie_name = NULL,
                  width = NULL,
-                 height = NULL, 
+                 height = NULL,
                  elementId = NULL) {
   type <- match.arg(
-    arg = type, 
+    arg = type,
     choices = c(
-      "column", "bar", 
-      "line", "spline", "step", 
+      "column", "bar",
+      "line", "spline", "step",
       "area", "area-spline", "area-step",
-      "pie", "donut", 
+      "pie", "donut",
       "radialBar",
-      "radar", 
+      "radar",
       "polarArea",
-      "scatter", "bubble", 
+      "scatter", "bubble",
       "heatmap",
       "treemap",
       "timeline",
@@ -62,11 +62,16 @@ apex <- function(data, mapping, type = "column", ...,
   data <- as.data.frame(data)
   if (identical(type, "heatmap")) {
     mapping <- rename_aes_heatmap(mapping)
+  } else {
+    mapping <- rename_aes(mapping)
   }
   if (identical(type, "scatter") & is_sized(mapping)) {
     type <- "bubble"
   }
   mapdata <- lapply(mapping, rlang::eval_tidy, data = data)
+  if (is.null(mapdata$y) & !type %in% c("candlestick", "timeline", "heatmap")) {
+    mapdata <- compute_count(mapdata)
+  }
   if (type %in% c("pie", "donut", "radialBar", "polarArea")) {
     opts <- list(
       chart = list(type = correct_type(type)),
@@ -76,7 +81,7 @@ apex <- function(data, mapping, type = "column", ...,
   } else {
     opts <- list(
       chart = dropNulls(list(
-        type = correct_type(type), 
+        type = correct_type(type),
         group = synchronize
       )),
       series = make_series(mapdata, mapping, type, serie_name)
@@ -91,10 +96,10 @@ apex <- function(data, mapping, type = "column", ...,
     opts$xaxis$labels$style$colors <- "#848484"
   }
   ax <- apexchart(
-    ax_opts = opts, 
-    width = width, 
+    ax_opts = opts,
+    width = width,
     height = height,
-    elementId = elementId, 
+    elementId = elementId,
     auto_update = auto_update
   )
   if (inherits(mapdata$x, c("character", "Date", "POSIXt", "numeric", "integer")) & length(mapdata$x) > 0) {
@@ -105,13 +110,15 @@ apex <- function(data, mapping, type = "column", ...,
   }
   ax$x$data <- data
   ax$x$mapping <- mapping
+  ax$x$type <- type
+  ax$x$serie_name <- serie_name
   class(ax) <- c(class(ax), "apex")
   return(ax)
 }
 
 
 # Construct series
-make_series <- function(mapdata, mapping, type = NULL, serie_name = NULL) {
+make_series <- function(mapdata, mapping, type = NULL, serie_name = NULL, force_datetime_names = FALSE) {
   if (identical(type, "candlestick")) {
     if (!all(c("x", "open", "high", "low", "close") %in% names(mapping)))
       stop("For candlestick charts 'x', 'open', 'high', 'low', and 'close' aesthetics must be provided.", call. = FALSE)
@@ -119,7 +126,7 @@ make_series <- function(mapdata, mapping, type = NULL, serie_name = NULL) {
       warning("'group' aesthetic in candlestick chart is not supported", call. = FALSE)
     mapdata$group <- NULL
     series <- parse_candlestick_data(mapdata)
-  } else if (identical(type, "rangeBar")) {
+  } else if (isTRUE(type %in% c("rangeBar", "timeline"))) {
     if (!all(c("x", "start", "end") %in% names(mapping)))
       stop("For timeline charts 'x', 'start', and 'end' aesthetics must be provided.", call. = FALSE)
     if (is.null(mapdata$group))
@@ -139,10 +146,10 @@ make_series <- function(mapdata, mapping, type = NULL, serie_name = NULL) {
       mapdata$x[is.na(mapdata$x)] <- "NA"
     x_order <- unique(mapdata$x)
     if (is_x_datetime(mapdata)) {
-      add_names <- FALSE
+      add_names <- force_datetime_names
       x_order <- sort(x_order)
     } else {
-      add_names <- names(mapping)
+      add_names <- names(mapdata)
     }
     if (is.null(serie_name) & !is.null(mapping$y))
       serie_name <- rlang::as_label(mapping$y)
@@ -167,7 +174,7 @@ make_series <- function(mapdata, mapping, type = NULL, serie_name = NULL) {
             name = x,
             type = multi_type(type),
             data = parse_df(
-              data = data, 
+              data = data,
               add_names = add_names
             )
           ))
@@ -241,8 +248,8 @@ correct_type <- function(type) {
 }
 
 multi_type <- function(x) {
-  multis <- c("column", "area", "line", 
-              "spline", "step", "scatter", 
+  multis <- c("column", "area", "line",
+              "spline", "step", "scatter",
               "bubble")
   if (isTRUE(x %in% multis)) {
     correct_type(x)
@@ -253,13 +260,39 @@ multi_type <- function(x) {
 
 range_num <- function(x) {
   if (is.numeric(x) & length(x) > 0) {
-    range(pretty(x))
+    p <- pretty(x)
+    list(
+      values = p,
+      n = length(p) - 1,
+      range = range(p)
+    )
   } else {
     NULL
   }
 }
 
 
+compute_count <- function(mapdata) {
+  if (!is_grouped(mapdata)) {
+    x <- mapdata$x
+    weight <- mapdata$weight %||% rep(1, length(x))
+    count <- tapply(weight, x, sum, na.rm = TRUE, simplify = FALSE)
+    mapdata$x <- names(count)
+    mapdata$y <- as.numeric(count)
+  } else {
+    weight <- mapdata$weight %||% rep(1, length(mapdata$x))
+    count <- tapply(weight, mapdata[c("x", "group")], sum, na.rm = TRUE, simplify = FALSE)
+    mapdata$x <- rep(rownames(count), ncol(count))
+    mapdata$y <- unlist(count, use.names = FALSE)
+    mapdata$group <- rep(colnames(count), each = nrow(count))
+  }
+  mapdata$y[is.na(mapdata$y)] <- 0
+  return(mapdata)
+}
+
+
+
+# Configs ----
 
 
 # Switch between auto configs according to type & mapping
@@ -268,7 +301,7 @@ choose_config <- function(type, mapdata) {
   range_x <- range_num(mapdata$x)
   range_y <- range_num(mapdata$y)
   switch(
-    type, 
+    type,
     "bar" = config_bar(horizontal = TRUE),
     "column" = config_bar(horizontal = FALSE, datetime = datetime),
     "line" = config_line(datetime = datetime),
@@ -296,7 +329,8 @@ config_bar <- function(horizontal = FALSE, datetime = FALSE) {
       )
     ),
     tooltip = list(
-      shared = TRUE, 
+      shared = TRUE,
+      intersect = FALSE,
       followCursor = TRUE
     )
   )
@@ -321,7 +355,7 @@ config_line <- function(curve = "straight", datetime = FALSE) {
     stroke = list(
       curve = curve,
       width = 2
-    ), 
+    ),
     yaxis = list(
       decimalsInFloat = 2
     )
@@ -340,17 +374,20 @@ config_scatter <- function(range_x, range_y, datetime = FALSE) {
     dataLabels = list(enabled = FALSE),
     xaxis = list(
       type = "numeric",
-      min = range_x[1], 
-      max = range_x[2],
+      min = range_x$range[1],
+      max = range_x$range[2],
+      tickAmount = range_x$n,
+      # labels = list(formatter = format_num("~r")),
       crosshairs = list(
         show = TRUE,
         stroke = list(dashArray = 0)
       )
     ),
     yaxis = list(
-      min = range_y[1], 
-      max = range_y[2],
-      decimalsInFloat = 3,
+      min = range_y$range[1],
+      max = range_y$range[2],
+      tickAmount = range_y$n,
+      labels = list(formatter = format_num("~r")),
       tooltip = list(
         enabled = TRUE
       )

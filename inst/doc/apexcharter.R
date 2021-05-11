@@ -4,41 +4,33 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 
-## ----message=FALSE, warning=FALSE---------------------------------------------
+## ----packages, message=FALSE, warning=FALSE-----------------------------------
 library(ggplot2)
 library(scales)
-library(dplyr)
 library(apexcharter)
 
 ## ----column-------------------------------------------------------------------
 data("mpg")
-n_manufac <- count(mpg, manufacturer)
 
-apex(data = n_manufac, type = "column", mapping = aes(x = manufacturer, y = n))
+apex(data = mpg, type = "column", mapping = aes(x = manufacturer))
 
 ## ----bar----------------------------------------------------------------------
-apex(data = n_manufac, type = "bar", mapping = aes(x = manufacturer, y = n))
+apex(data = mpg, type = "bar", mapping = aes(x = manufacturer))
 
 ## ----dodge-bar----------------------------------------------------------------
-n_manufac_year <- count(mpg, manufacturer, year)
-
-apex(data = n_manufac_year, type = "column", mapping = aes(x = manufacturer, y = n, fill = year))
+apex(data = mpg, type = "column", mapping = aes(x = manufacturer, fill = year))
 
 ## ----stacked-bar--------------------------------------------------------------
-apex(data = n_manufac_year, type = "column", mapping = aes(x = manufacturer, y = n, fill = year)) %>% 
+apex(data = mpg, type = "column", mapping = aes(x = manufacturer, fill = year)) %>% 
   ax_chart(stacked = TRUE)
 
 ## ----line---------------------------------------------------------------------
 data("economics")
-economics <- tail(economics, 100)
 
 apex(data = economics, type = "line", mapping = aes(x = date, y = uempmed))
 
 ## ----lines--------------------------------------------------------------------
 data("economics_long")
-economics_long <- economics_long %>% 
-  group_by(variable) %>% 
-  slice((n()-100):n())
 
 apex(data = economics_long, type = "line", mapping = aes(x = date, y = value01, group = variable)) %>% 
   ax_yaxis(decimalsInFloat = 2) # number of decimals to keep
@@ -97,7 +89,7 @@ new_mtcars <- reshape(
 
 apex(data = new_mtcars, type = "radar", mapping = aes(x = model, y = value, group = time))
 
-## -----------------------------------------------------------------------------
+## ----polar-area---------------------------------------------------------------
 apex(mtcars, aes(rownames(mtcars), mpg), type = "polarArea") %>% 
   ax_legend(show = FALSE) %>% 
   ax_colors(col_numeric("Blues", domain = NULL)(mtcars$mpg)) %>% 
@@ -106,26 +98,26 @@ apex(mtcars, aes(rownames(mtcars), mpg), type = "polarArea") %>%
   ax_tooltip(fillSeriesColor = FALSE)
 
 ## ----heatmap------------------------------------------------------------------
-txhousing2 <- txhousing %>% 
-  filter(city %in% head(unique(city)), year %in% c(2000, 2001)) %>% 
-  rename(val_med = median)
+# create some data
+sales <- expand.grid(year = 2010:2020, month = month.name)
+sales$value <- sample(-10:30, nrow(sales), TRUE)
 
 apex(
-  data = txhousing2,
+  data = sales,
   type = "heatmap", 
-  mapping = aes(x = date, y = city, fill = scales::rescale(val_med))
+  mapping = aes(x = year, y = month, fill = value)
 ) %>% 
   ax_dataLabels(enabled = FALSE) %>% 
   ax_colors("#008FFB")
 
 ## ----treemap------------------------------------------------------------------
 data("mpg", package = "ggplot2")
-n_manufac <- dplyr::count(mpg, manufacturer)
 
-apex(n_manufac, aes(x = manufacturer, y = n), "treemap")
+apex(mpg, aes(x = manufacturer), "treemap")
 
-## -----------------------------------------------------------------------------
+## ----candlestick--------------------------------------------------------------
 data("candles", package = "apexcharter")
+
 apex(
   candles, 
   aes(x = datetime, open = open, close = close, low = low, high = high),
