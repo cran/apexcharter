@@ -1,0 +1,55 @@
+{
+  "name": "sq",
+  "options": {
+    "months": [
+      "Janar",
+      "Shkurt",
+      "Mars",
+      "Prill",
+      "Maj",
+      "Qershor",
+      "Korrik",
+      "Gusht",
+      "Shtator",
+      "Tetor",
+      "N\u00ebntor",
+      "Dhjetor"
+    ],
+    "shortMonths": [
+      "Jan",
+      "Shk",
+      "Mar",
+      "Pr",
+      "Maj",
+      "Qer",
+      "Korr",
+      "Gush",
+      "Sht",
+      "Tet",
+      "N\u00ebn",
+      "Dhj"
+    ],
+    "days": [
+      "e Diel\u00eb",
+      "e H\u00ebn\u00eb",
+      "e Mart\u00eb",
+      "e M\u00ebrkur\u00eb",
+      "e Enjte",
+      "e Premte",
+      "e Shtun\u00eb"
+    ],
+    "shortDays": ["Die", "H\u00ebn", "Mar", "M\u00ebr", "Enj", "Pre", "Sht"],
+    "toolbar": {
+      "exportToSVG": "Shkarko SVG",
+      "exportToPNG": "Shkarko PNG",
+      "exportToCSV": "Shkarko CSV",
+      "menu": "Menu",
+      "selection": "Seleksiono",
+      "selectionZoom": "Seleksiono Zmadhim",
+      "zoomIn": "Zmadho",
+      "zoomOut": "Zvog\u00eblo",
+      "pan": "Spostoje",
+      "reset": "Rikthe dimensionin"
+    }
+  }
+}

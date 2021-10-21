@@ -5,28 +5,25 @@
 <!-- badges: start -->
 [![version](http://www.r-pkg.org/badges/version/apexcharter)](https://CRAN.R-project.org/package=apexcharter)
 [![cran checks](https://cranchecks.info/badges/worst/apexcharter)](https://cranchecks.info/pkgs/apexcharter)
-[![R build status](https://github.com/dreamRs/apexcharter/workflows/R-CMD-check/badge.svg)](https://github.com/dreamRs/apexcharter/actions)
-[![Codecov test coverage](https://codecov.io/gh/dreamRs/apexcharter/branch/master/graph/badge.svg)](https://codecov.io/gh/dreamRs/apexcharter?branch=master)
+[![Codecov test coverage](https://codecov.io/gh/dreamRs/apexcharter/branch/master/graph/badge.svg)](https://app.codecov.io/gh/dreamRs/apexcharter?branch=master)
+[![R-CMD-check](https://github.com/dreamRs/apexcharter/workflows/R-CMD-check/badge.svg)](https://github.com/dreamRs/apexcharter/actions)
 <!-- badges: end -->
-
-
-:warning: Use RStudio >= 1.2 to properly display charts
 
 
 
 ## Installation
 
-Install from CRAN with:
+Install from [CRAN](https://CRAN.R-project.org/package=apexcharter) with:
 
 ```r
 install.packages("apexcharter")
 ```
 
-Or install the development version from [GitHub](https://github.com/) with:
+Or install the development version from [GitHub](https://github.com/dreamRs/apexcharter) with:
 
-``` r
-# install.packages("devtools")
-devtools::install_github("dreamRs/apexcharter")
+```r
+# install.packages("remotes")
+remotes::install_github("dreamRs/apexcharter")
 ```
 
 
@@ -140,4 +137,28 @@ apexchart(ax_opts = list(
 ```
 
 ![](man/figures/raw-api.png)
+
+
+
+## Development
+
+This package use [{packer}](https://github.com/JohnCoene/packer) to manage JavaScript assets, see packer's [documentation](https://packer.john-coene.com/#/) for more.
+
+Install nodes modules with:
+
+```r
+packer::npm_install()
+```
+
+Modify `srcjs/widgets/apexcharter.js`, then run:
+
+```r
+packer::bundle()
+```
+
+Re-install R package and try `apexcharter()` or `apex()` functions.
+
+
+
+
 

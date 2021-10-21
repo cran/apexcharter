@@ -1,0 +1,55 @@
+{
+  "name": "zh-cn",
+  "options": {
+    "months": [
+      "\u4e00\u6708",
+      "\u4e8c\u6708",
+      "\u4e09\u6708",
+      "\u56db\u6708",
+      "\u4e94\u6708",
+      "\u516d\u6708",
+      "\u4e03\u6708",
+      "\u516b\u6708",
+      "\u4e5d\u6708",
+      "\u5341\u6708",
+      "\u5341\u4e00\u6708",
+      "\u5341\u4e8c\u6708"
+    ],
+    "shortMonths": [
+      "\u4e00\u6708",
+      "\u4e8c\u6708",
+      "\u4e09\u6708",
+      "\u56db\u6708",
+      "\u4e94\u6708",
+      "\u516d\u6708",
+      "\u4e03\u6708",
+      "\u516b\u6708",
+      "\u4e5d\u6708",
+      "\u5341\u6708",
+      "\u5341\u4e00\u6708",
+      "\u5341\u4e8c\u6708"
+    ],
+    "days": [
+      "\u661f\u671f\u5929",
+      "\u661f\u671f\u4e00",
+      "\u661f\u671f\u4e8c",
+      "\u661f\u671f\u4e09",
+      "\u661f\u671f\u56db",
+      "\u661f\u671f\u4e94",
+      "\u661f\u671f\u516d"
+    ],
+    "shortDays": ["\u5468\u65e5", "\u5468\u4e00", "\u5468\u4e8c", "\u5468\u4e09", "\u5468\u56db", "\u5468\u4e94", "\u5468\u516d"],
+    "toolbar": {
+      "exportToSVG": "\u4e0b\u8f7d SVG",
+      "exportToPNG": "\u4e0b\u8f7d PNG",
+      "exportToCSV": "\u4e0b\u8f7d CSV",
+      "menu": "\u83dc\u5355",
+      "selection": "\u9009\u62e9",
+      "selectionZoom": "\u9009\u62e9\u7f29\u653e",
+      "zoomIn": "\u653e\u5927",
+      "zoomOut": "\u7f29\u5c0f",
+      "pan": "\u5e73\u79fb",
+      "reset": "\u91cd\u7f6e\u7f29\u653e"
+    }
+  }
+}

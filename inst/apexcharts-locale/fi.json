@@ -1,0 +1,55 @@
+{
+  "name": "fi",
+  "options": {
+    "months": [
+      "Tammikuu",
+      "Helmikuu",
+      "Maaliskuu",
+      "Huhtikuu",
+      "Toukokuu",
+      "Kes\u00e4kuu",
+      "Hein\u00e4kuu",
+      "Elokuu",
+      "Syyskuu",
+      "Lokakuu",
+      "Marraskuu",
+      "Joulukuu"
+    ],
+    "shortMonths": [
+      "Tammi",
+      "Helmi",
+      "Maalis",
+      "Huhti",
+      "Touko",
+      "Kes\u00e4",
+      "Hein\u00e4",
+      "Elo",
+      "Syys",
+      "Loka",
+      "Marras",
+      "Joulu"
+    ],
+    "days": [
+      "Sunnuntai",
+      "Maanantai",
+      "Tiistai",
+      "Keskiviikko",
+      "Torstai",
+      "Perjantai",
+      "Lauantai"
+    ],
+    "shortDays": ["Su", "Ma", "Ti", "Ke", "To", "Pe", "La"],
+    "toolbar": {
+      "exportToSVG": "Lataa SVG",
+      "exportToPNG": "Lataa PNG",
+      "exportToCSV": "Lataa CSV",
+      "menu": "Valikko",
+      "selection": "Valinta",
+      "selectionZoom": "Valinnan zoomaus",
+      "zoomIn": "L\u00e4henn\u00e4",
+      "zoomOut": "Loitonna",
+      "pan": "Panoroi",
+      "reset": "Nollaa zoomaus"
+    }
+  }
+}

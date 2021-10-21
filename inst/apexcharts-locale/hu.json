@@ -1,0 +1,64 @@
+{
+  "name": "hu",
+  "options": {
+    "months": [
+      "janu\u00e1r",
+      "febru\u00e1r",
+      "m\u00e1rcius",
+      "\u00e1prilis",
+      "m\u00e1jus",
+      "j\u00fanius",
+      "j\u00falius",
+      "augusztus",
+      "szeptember",
+      "okt\u00f3ber",
+      "november",
+      "december"
+    ],
+    "shortMonths": [
+      "jan",
+      "feb",
+      "mar",
+      "\u00e1pr",
+      "m\u00e1j",
+      "j\u00fan",
+      "j\u00fal",
+      "aug",
+      "szept",
+      "okt",
+      "nov",
+      "dec"
+    ],
+    "days": [
+      "h\u00e9tf\u0151",
+      "kedd",
+      "szerda",
+      "cs\u00fct\u00f6rt\u00f6k",
+      "p\u00e9ntek",
+      "szombat",
+      "vas\u00e1rnap"
+    ],
+    "shortDays": [
+      "H",
+      "K",
+      "Sze",
+      "Cs",
+      "P",
+      "Szo",
+      "V"
+    ],
+    "toolbar": {
+      "exportToSVG": "Export\u00e1l\u00e1s SVG-be",
+      "exportToPNG": "Export\u00e1l\u00e1s PNG-be",
+      "exportToCSV": "Export\u00e1l\u00e1s CSV-be",
+      "menu": "F\u0151 aj\u00e1nlat",
+      "download": "SVG let\u00f6lt\u00e9se",
+      "selection": "Kiv\u00e1laszt\u00e1s",
+      "selectionZoom": "Nagy\u00edt\u00f3 kiv\u00e1laszt\u00e1sa",
+      "zoomIn": "Nagy\u00edt\u00e1s",
+      "zoomOut": "Kicsiny\u00edt\u00e9s",
+      "pan": "K\u00e9pcs\u00fasztat\u00e1s",
+      "reset": "Nagy\u00edt\u00f3 vissza\u00e1ll\u00edt\u00e1sa"
+    }
+  }
+}
