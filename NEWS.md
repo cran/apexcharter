@@ -1,3 +1,11 @@
+apexcharter 0.3.1
+==================
+
+* Updated ApexCharts.js to 3.33.1
+* Minimal {htmlwidgets} version required >= 1.5.3
+
+
+
 apexcharter 0.3.0
 ==================
 
