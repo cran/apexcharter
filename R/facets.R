@@ -1,114 +1,4 @@
 
-#' @importFrom rlang eval_tidy
-get_facets <- function(data, rows, cols, type = c("wrap", "grid")) {
-  type <- match.arg(type)
-  byrows <- lapply(X = rows, FUN = eval_tidy, data = data)
-  bycols <- lapply(X = cols, FUN = eval_tidy, data = data)
-  facets <- split(x = data, f = c(bycols, byrows), sep = "|__|")
-  facets <- lapply(
-    X = seq_along(facets),
-    FUN = function(i) {
-      facet <- facets[[i]]
-      attr(facet, "keys") <- strsplit(
-        x = names(facets)[i],
-        split = "|__|", fixed = TRUE
-      )[[1]]
-      facet
-    }
-  )
-  label_row <- lapply(byrows, unique)
-  label_row <- lapply(label_row, sort)
-  label_row <- apply(expand.grid(label_row), 1, paste, collapse = "*")
-  label_col <- lapply(bycols, unique)
-  label_col <- lapply(label_col, sort)
-  label_col <- apply(expand.grid(label_col), 1, paste, collapse = "*")
-  list(
-    facets = facets,
-    nrow = if (identical(type, "grid")) n_facet(byrows) else NULL,
-    ncol = if (identical(type, "grid")) n_facet(bycols) else NULL,
-    label_row = label_row,
-    label_col = label_col
-  )
-}
-
-n_facet <- function(l) {
-  l <- lapply(l, function(x) {
-    length(unique(x))
-  })
-  Reduce(`*`, l)
-}
-
-#' @importFrom rlang %||%
-set_scale <- function(ax, values, scales = c("fixed", "free", "free_y", "free_x"), axis = c("x", "y")) {
-  if (is.null(scales))
-    return(ax)
-  scales <- match.arg(scales)
-  axis <- match.arg(axis)
-  if (is.null(values))
-    return(ax)
-  if (inherits(values, c("numeric", "integer", "Date", "POSIXt"))) {
-    range_vals <- range(pretty(values, n = 10), na.rm = TRUE)
-  } else {
-    range_vals <- NULL
-  }
-
-  fmt <- function(x, time = inherits(values, c("Date", "POSIXt"))) {
-    if (is.null(x))
-      return(NULL)
-    if (time)
-      x <- format_date(x)
-    x
-  }
-
-  waxis <- switch(
-    axis,
-    "x" = "xaxis",
-    "y" = "yaxis"
-  )
-
-  if (scales == "fixed") {
-    ax$x$ax_opts[[waxis]]$min <- ax$x$ax_opts[[waxis]]$min %||% fmt(range_vals[1])
-    ax$x$ax_opts[[waxis]]$max <- ax$x$ax_opts[[waxis]]$max %||% fmt(range_vals[2])
-  } else if (scales == "free") {
-    ax$x$ax_opts[[waxis]]$min <- NULL
-    ax$x$ax_opts[[waxis]]$max <- NULL
-  } else if (scales == "free_x") {
-    if (axis == "y") {
-      ax$x$ax_opts[[waxis]]$min <- ax$x$ax_opts[[waxis]]$min %||% fmt(range_vals[1])
-      ax$x$ax_opts[[waxis]]$max <- ax$x$ax_opts[[waxis]]$max %||% fmt(range_vals[2])
-    } else {
-      ax$x$ax_opts[[waxis]]$min <- NULL
-      ax$x$ax_opts[[waxis]]$max <- NULL
-    }
-  } else if (scales == "free_y") {
-    if (axis == "x") {
-      ax$x$ax_opts[[waxis]]$min <- ax$x$ax_opts[[waxis]]$min %||% fmt(range_vals[1])
-      ax$x$ax_opts[[waxis]]$max <- ax$x$ax_opts[[waxis]]$max %||% fmt(range_vals[2])
-    } else {
-      ax$x$ax_opts[[waxis]]$min <- NULL
-      ax$x$ax_opts[[waxis]]$max <- NULL
-    }
-  }
-
-  return(ax)
-}
-
-
-get_option <- function(ax, opt1, opt2 = NULL) {
-  if (is.null(opt2)) {
-    ax$x$ax_opts[[opt1]]
-  } else {
-    ax$x$ax_opts[[opt1]][[opt2]]
-  }
-}
-remove_option <- function(ax, opt1, opt2 = NULL) {
-  if (is.null(opt2)) {
-    ax$x$ax_opts[[opt1]] <- NULL
-  } else {
-    ax$x$ax_opts[[opt1]][[opt2]] <- NULL
-  }
-  ax
-}
 
 #' @importFrom rlang eval_tidy is_null is_function
 build_facets <- function(chart) {
@@ -144,6 +34,14 @@ build_facets <- function(chart) {
     byrow = TRUE
   )
   lrow <- get_last_row(grid)
+  facet_data_add_line <- if (!is.null(chart$x$add_line)) {
+    get_facets(
+      data = chart$x$add_line$data,
+      rows = chart$x$facet$facets_row,
+      cols = chart$x$facet$facets_col,
+      type = chart$x$facet$type
+    )$facets
+  }
   facets <- lapply(
     X = nums,
     FUN = function(i) {
@@ -176,7 +74,37 @@ build_facets <- function(chart) {
       if (!is.null(new$x$colors_manual)) {
         new <- ax_colors_manual(ax = new, values = new$x$colors_manual)
       }
-      new$height <- chart$x$facet$chart_height
+      if (!is.null(facet_data_add_line)) {
+        maplinedata <- lapply(chart$x$add_line$mapping, eval_tidy, data = facet_data_add_line[[i]])
+        if (chart$x$facet$scales %in% c("fixed", "free_y") & chart$x$type %in% c("bar")) {
+          maplinedata <- complete_mapdata(maplinedata, mapall)
+        }
+        if (chart$x$facet$scales %in% c("fixed", "free_x") & chart$x$type %in% c("column")) {
+          maplinedata <- complete_mapdata(maplinedata, mapall)
+        }
+        new$x$ax_opts$series <- c(
+          new$x$ax_opts$series,
+          make_series(
+            mapdata = maplinedata,
+            mapping = chart$x$add_line$mapping,
+            type = chart$x$add_line$type,
+            serie_name = chart$x$add_line$serie_name,
+            force_datetime_names = c("x", "y")
+          )
+        )
+        # new <- add_line(
+        #   ax = new,
+        #   mapping = chart$x$add_line$mapping,
+        #   data = facet_data_add_line[[i]],
+        #   type = chart$x$add_line$type,
+        #   serie_name = chart$x$add_line$serie_name
+        # )
+      }
+      if (has_yaxis2(new)) {
+        values <- get_yaxis_serie(chart, 2)
+        new <- set_scale(new, values, scales = chart$x$facet$scales, axis = "y2")
+      }
+      new$height <- chart$height %||% chart$x$facet$chart_height
       new$x$facet <- NULL
       class(new) <- setdiff(class(new), "apex_facet")
       return(new)
@@ -207,23 +135,24 @@ get_last_row <- function(mat) {
 
 
 #' @title Facets for ApexCharts
-#' 
+#'
 #' @description Create matrix of charts by row and column faceting variable (`ax_facet_grid`),
 #'  or by specified number of row and column for faceting variable(s) (`ax_facet_wrap`).
 #'
-#' @param ax An [apexchart()] `htmlwidget` object. 
+#' @param ax An [apexchart()] `htmlwidget` object.
 #' @param facets Variable(s) to use for facetting, wrapped in `vars(...)`.
 #' @param nrow,ncol Number of row and column in output matrix.
 #' @param scales Should scales be fixed (`"fixed"`, the default),
 #'  free (`"free"`), or free in one dimension (`"free_x"`, `"free_y"`)?
 #' @param labeller A function with one argument containing for each facet the value of the faceting variable.
-#' @param chart_height Individual chart height.
+#' @param chart_height Individual chart height, ignored if an height is defined in `apex()` or `apexcharter()`.
+#' @param grid_width Total width for the grid, regardless of the number of column.
 #'
 #' @return An [apexchart()] `htmlwidget` object with an additionnal class `"apex_facet"`.
-#' 
+#'
 #' @details # Warning
 #' To properly render in Shiny applications, use [apexfacetOutput()] (in UI) and [renderApexfacet()] (in Server).
-#' 
+#'
 #' @export
 #'
 #' @name apex-facets
@@ -237,7 +166,8 @@ ax_facet_wrap <- function(ax,
                           ncol = NULL,
                           scales = c("fixed", "free", "free_y", "free_x"),
                           labeller = label_value,
-                          chart_height = "300px") {
+                          chart_height = "300px",
+                          grid_width = "100%") {
   if (!inherits(ax, "apex"))
     stop("ax_facet_wrap only works with charts generated with apex()", call. = FALSE)
   scales <- match.arg(scales)
@@ -250,6 +180,7 @@ ax_facet_wrap <- function(ax,
     scales = scales,
     labeller = labeller,
     chart_height = chart_height,
+    grid_width = grid_width,
     type = "wrap"
   )
   class(ax) <- c("apex_facet", class(ax))
@@ -269,7 +200,8 @@ ax_facet_grid <- function(ax,
                           cols = NULL,
                           scales = c("fixed", "free", "free_y", "free_x"),
                           labeller = label_value,
-                          chart_height = "300px") {
+                          chart_height = "300px",
+                          grid_width = "100%") {
   if (!inherits(ax, "apex"))
     stop("ax_facet_wrap only works with charts generated with apex()", call. = FALSE)
   scales <- match.arg(scales)
@@ -285,6 +217,7 @@ ax_facet_grid <- function(ax,
     scales = scales,
     labeller = labeller,
     chart_height = chart_height,
+    grid_width = grid_width,
     type = "grid"
   )
   class(ax) <- c("apex_facet", class(ax))
@@ -298,6 +231,7 @@ ax_facet_grid <- function(ax,
 # Tag ---------------------------------------------------------------------
 
 #' @importFrom rlang %||%
+#' @importFrom htmltools tags css validateCssUnit
 build_facet_tag <- function(x) {
   facets <- build_facets(x)
   content <- facets$facets
@@ -359,10 +293,10 @@ build_facet_tag <- function(x) {
   }
   if (identical(facets$type, "wrap")) {
     TAG <- build_grid(
-      content = content, 
-      nrow = d$nrow, 
-      ncol = d$ncol, 
-      row_after = row_after, 
+      content = content,
+      nrow = d$nrow,
+      ncol = d$ncol,
+      row_after = row_after,
       col_before = col_before
     )
   } else if (identical(facets$type, "grid")) {
@@ -398,7 +332,7 @@ build_facet_tag <- function(x) {
       col_after = if (!is.null(facets$nrow)) "30px",
       row_gap = "3px",
       col_gap = "3px",
-      row_after = row_after, 
+      row_after = row_after,
       col_before = col_before
     )
   } else {
@@ -424,6 +358,11 @@ build_facet_tag <- function(x) {
       TAG
     )
   }
+  TAG <- tags$div(
+    style = css(width = validateCssUnit(x$x$facet$grid_width)),
+    class = "apexcharter-facet",
+    TAG
+  )
   return(TAG)
 }
 
@@ -462,8 +401,8 @@ apexfacetOutput <- function(outputId) {
 #' @param env The environment in which to evaluate `expr`.
 #' @param quoted Is `expr` a quoted expression (with `quote()`)? This
 #'   is useful if you want to save an expression in a variable.
-#'   
-#' @seealso [ax_facet_wrap()], [ax_facet_grid()] 
+#'
+#' @seealso [ax_facet_wrap()], [ax_facet_grid()]
 #'
 #' @export
 #'
@@ -524,8 +463,8 @@ complete_mapdata <- function(mapdata, mapall) {
   data <- as.data.frame(mapdata)
   full_x <- unique(mapall$x)
   full_data <- data.frame(
-    xorder = seq_along(full_x), 
-    x = full_x, 
+    xorder = seq_along(full_x),
+    x = full_x,
     stringsAsFactors = FALSE
   )
   full_data <- merge(
@@ -556,5 +495,4 @@ complete_data <- function(data, vars, fill_var, fill_value = 0) {
   full_data[[fill_var]][is.na(full_data[[fill_var]])] <- fill_value
   return(full_data)
 }
-
 
