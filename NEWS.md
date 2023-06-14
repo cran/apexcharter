@@ -1,8 +1,17 @@
+apexcharter 0.4.1
+==================
+
+* Updated ApexCharts.js to 3.41.0 (new charts type: dumbbell chart and funnel chart).
+* `apex()` : added support for boxplot.
+* New function `ax_forecast_data_points()` to mark points as forecasted values.
+
+
+
 apexcharter 0.4.0
 ==================
 
 * Updated ApexCharts.js to 3.36.3.
-* New chart type : range area charts
+* New chart type : range area charts.
 * Facets: correctly manage secondary y axis.
 
 

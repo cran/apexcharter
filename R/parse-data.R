@@ -110,6 +110,44 @@ parse_timeline_data <- function(.list) {
 }
 
 
+parse_dumbbell_data <- function(.list) {
+  if (is.null(.list$group)) {
+    lapply(
+      X = seq_len(length(.list[[1]])),
+      FUN = function(i) {
+        val <- lapply(.list, `[[`, i)
+        l <- list(
+          x = as.character(val$y),
+          y = list(val$x, val$xend)
+        )
+        if (!is.null(val$fill)) {
+          l$fillColor <- val$fill
+        }
+        l
+      }
+    )
+  } else {
+    grouped <- as.data.frame(.list, stringsAsFactors = FALSE)
+    grouped$group <- NULL
+    grouped <- split(
+      x = grouped,
+      f = .list$group
+    )
+    grouped <- lapply(grouped, as.list)
+    lapply(
+      X = names(grouped),
+      FUN = function(name) {
+        list(
+          name = name,
+          data = parse_dumbbell_data(grouped[[name]])
+        )
+      }
+    )
+  }
+}
+
+
+
 parse_candlestick_data <- function(.list) {
   list(list(
     type = "candlestick",
@@ -127,3 +165,30 @@ parse_candlestick_data <- function(.list) {
   ))
 }
 
+
+#' @importFrom graphics boxplot
+parse_boxplot_data <- function(.list, serie_name = NULL) {
+  if (!is.numeric(.list$y) & is.numeric(.list$x)) {
+    .list[c("x", "y")] <- .list[c("y", "x")]
+  }
+  boxed <- boxplot(y ~ x, data = .list, plot = FALSE) 
+  list(dropNulls(list(
+    serie_name = serie_name,
+    type = "boxPlot",
+    data = lapply(
+      X = seq_along(boxed$names),
+      FUN = function(i) {
+        list(
+          x = boxed$names[i],
+          y = c(
+            boxed$stats[1, i],
+            boxed$stats[2, i],
+            boxed$stats[3, i],
+            boxed$stats[4, i],
+            boxed$stats[5, i]
+          )
+        )
+      }
+    )
+  )))
+}

@@ -14,7 +14,7 @@
 #'  `"pie"`, `"donut"`,
 #'  `"radialBar"`, `"radar"`, `"scatter"`,
 #'  `"heatmap"`, `"treemap"`,
-#'  `"timeline"`.
+#'  `"timeline"` and `"dumbbell"`.
 #' @param ... Other arguments passed on to methods. Not currently used.
 #' @param synchronize Give a common id to charts to synchronize them (tooltip and zoom).
 #' @param serie_name Name for the serie displayed in tooltip,
@@ -43,6 +43,7 @@ apex <- function(data, mapping,
     arg = type,
     choices = c(
       "column", "bar",
+      "rangeBar", "dumbbell",
       "line", "spline", "step",
       "area", "area-spline", "area-step",
       "rangeArea",
@@ -54,7 +55,8 @@ apex <- function(data, mapping,
       "heatmap",
       "treemap",
       "timeline",
-      "candlestick"
+      "candlestick",
+      "boxplot"
     )
   )
   data <- as.data.frame(data)
@@ -67,7 +69,8 @@ apex <- function(data, mapping,
     type <- "bubble"
   }
   mapdata <- lapply(mapping, rlang::eval_tidy, data = data)
-  if (is.null(mapdata$y) & !type %in% c("candlestick", "timeline", "heatmap", "rangeArea")) {
+  type_no_compute <- c("candlestick", "boxplot", "timeline", "heatmap", "rangeArea", "rangeBar", "dumbbell")
+  if (is.null(mapdata$y) & !type %in% type_no_compute) {
     mapdata <- compute_count(mapdata)
   }
   if (type %in% c("pie", "donut", "radialBar", "polarArea")) {
@@ -118,7 +121,9 @@ apex <- function(data, mapping,
 # Construct series
 #' @importFrom rlang %||%
 make_series <- function(mapdata, mapping, type = NULL, serie_name = NULL, force_datetime_names = FALSE) {
-  if (identical(type, "candlestick")) {
+  if (identical(type, "boxplot")) {
+    series <- parse_boxplot_data(mapdata, serie_name = serie_name)
+  } else if (identical(type, "candlestick")) {
     if (!all(c("x", "open", "high", "low", "close") %in% names(mapping)))
       stop("For candlestick charts 'x', 'open', 'high', 'low', and 'close' aesthetics must be provided.", call. = FALSE)
     if (!is.null(mapdata$group))
@@ -131,6 +136,12 @@ make_series <- function(mapdata, mapping, type = NULL, serie_name = NULL, force_
     if (is.null(mapdata$group))
       mapdata$group <- serie_name %||% rlang::as_label(mapping$x)
     series <- parse_timeline_data(mapdata)
+  } else if (isTRUE(type %in% c("dumbbell"))) {
+    if (!all(c("y", "x", "xend") %in% names(mapping)))
+      stop("For dumbbell charts 'x', 'xend', and 'y' aesthetics must be provided.", call. = FALSE)
+    if (is.null(mapdata$group))
+      mapdata$group <- serie_name %||% rlang::as_label(mapping$x)
+    series <- parse_dumbbell_data(mapdata)
   } else {
     mapdata <- as.data.frame(mapdata, stringsAsFactors = FALSE)
     if (all(rlang::has_name(mapdata, c("ymin", "ymax")))) {
@@ -242,14 +253,16 @@ list1 <- function(x) {
 
 # Change type of charts for helpers type
 correct_type <- function(type) {
-  if (identical(type, "column")) {
+  if (isTRUE(type %in% c("column"))) {
     "bar"
   } else if (isTRUE(type %in% c("spline", "step"))) {
     "line"
   } else if (isTRUE(type %in% c("area-spline", "area-step"))) {
     "area"
-  } else if (identical(type, "timeline")) {
+  } else if (isTRUE(type %in% c("timeline", "dumbbell"))) {
     "rangeBar"
+  } else if (identical(type, "boxplot")) {
+    "boxPlot"
   } else {
     type
   }
@@ -308,9 +321,13 @@ choose_config <- function(type, mapdata) {
   datetime <- is_x_datetime(mapdata)
   range_x <- range_num(mapdata$x)
   range_y <- range_num(mapdata$y)
+  if (identical(type, "boxplot")) {
+    box_horiz <- !is.numeric(mapdata$y) & is.numeric(mapdata$x)
+  }
   switch(
     type,
     "bar" = config_bar(horizontal = TRUE),
+    "dumbbell" = config_bar(horizontal = TRUE, isDumbbell = TRUE),
     "column" = config_bar(horizontal = FALSE, datetime = datetime),
     "line" = config_line(datetime = datetime),
     "area" = config_line(datetime = datetime),
@@ -323,34 +340,32 @@ choose_config <- function(type, mapdata) {
     "bubble" = config_scatter(range_x = range_x, range_y = range_y, datetime = datetime),
     "timeline" = config_timeline(),
     "candlestick" = config_candlestick(),
+    "boxplot" = config_boxplot(horizontal = box_horiz),
     list()
   )
 }
 
 
 # Config for column & bar charts
-config_bar <- function(horizontal = FALSE, datetime = FALSE) {
+config_bar <- function(horizontal = FALSE, datetime = FALSE, isDumbbell = FALSE) {
   config <- list(
     dataLabels = list(enabled = FALSE),
     plotOptions = list(
       bar = list(
-        horizontal = horizontal
+        horizontal = horizontal,
+        isDumbbell = isDumbbell
       )
     ),
     tooltip = list(
       shared = TRUE,
       intersect = FALSE,
       followCursor = TRUE
+    ),
+    grid = list(
+      yaxis = list(lines = list(show = !isTRUE(horizontal))),
+      xaxis = list(lines = list(show = isTRUE(horizontal)))
     )
   )
-  if (isTRUE(horizontal)) {
-    config <- c(config, list(
-      grid = list(
-        yaxis = list(lines = list(show = FALSE)),
-        xaxis = list(lines = list(show = TRUE))
-      )
-    ))
-  }
   if (isTRUE(datetime)) {
     config$xaxis$type <- "datetime"
   }
@@ -432,6 +447,16 @@ config_candlestick <- function() {
   list(
     xaxis = list(
       type = "datetime"
+    )
+  )
+}
+
+config_boxplot <- function(horizontal = FALSE) {
+  list(
+    plotOptions = list(
+      bar = list(
+        horizontal = horizontal
+      )
     )
   )
 }

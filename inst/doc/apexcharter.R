@@ -37,10 +37,51 @@ apex(data = economics_long, type = "line", mapping = aes(x = date, y = value01, 
   ax_yaxis(decimalsInFloat = 2) # number of decimals to keep
 
 ## ----area---------------------------------------------------------------------
-apex(data = economics_long, type = "area", mapping = aes(x = date, y = value01, fill = variable)) %>% 
-  ax_yaxis(decimalsInFloat = 2) %>% # number of decimals to keep
-  ax_chart(stacked = TRUE) %>%
-  ax_yaxis(max = 4, tickAmount = 4)
+data("eco2mix", package = "apexcharter")
+
+apex(eco2mix, aes(datetime, production, fill = source), type = "area") %>% 
+  ax_chart(animations = list(enabled = FALSE), stacked = TRUE) %>% 
+  ax_stroke(width = 1) %>% 
+  ax_fill(opacity = 1, type = "solid") %>% 
+  ax_tooltip(x = list(format = "dd MMM, HH:mm")) %>% 
+  ax_yaxis(labels = list(formatter = format_num("~", suffix = "MW"))) %>% 
+  ax_colors_manual(
+    list(
+      "bioenergies" = "#156956",
+      "fuel" = "#80549f",
+      "coal" = "#a68832",
+      "solar" = "#d66b0d",
+      "gas" = "#f20809",
+      "wind" = "#72cbb7",
+      "hydraulic" = "#2672b0",
+      "nuclear" = "#e4a701",
+      "pumping" = "#0e4269"
+    )
+  ) %>% 
+  ax_labs(
+    title = "Electricity generation by sector in France",
+    subtitle = "Data from \u00e9CO\u2082mix"
+  )
+
+## ----ribbon-------------------------------------------------------------------
+data("temperatures", package = "apexcharter")
+
+apex(
+  temperatures, 
+  aes(x = date, ymin = low, ymax = high), 
+  type = "rangeArea", 
+  serie_name = "Low/High (2018-2021)"
+) %>% 
+  add_line(aes(date, `2023`)) %>% 
+  ax_chart(animations = list(enabled = FALSE)) %>% 
+  ax_yaxis(tickAmount = 7, labels = list(formatter = format_num("~", suffix = "°C"))) %>% 
+  ax_colors(c("#8485854D", "#FF0000")) %>%
+  ax_stroke(width = c(1, 2)) %>% 
+  ax_fill(opacity = 1, type = "solid") %>% 
+  ax_labs(
+    title = "Temperatures in 2023 with range from 2018 to 2021",
+    subtitle = "Data from ENEDIS"
+  )
 
 ## ----scatter------------------------------------------------------------------
 apex(data = mtcars, type = "scatter", mapping = aes(x = wt, y = mpg))
@@ -58,6 +99,9 @@ poll <- data.frame(
 )
 
 apex(data = poll, type = "pie", mapping = aes(x = answer, y = n))
+
+## ----donut--------------------------------------------------------------------
+apex(data = poll, type = "donut", mapping = aes(x = answer, y = n))
 
 ## ----radial-------------------------------------------------------------------
 apex(data = NULL, type = "radialBar", mapping = aes(x = "My value", y = 65))
@@ -124,4 +168,28 @@ apex(
   aes(x = datetime, open = open, close = close, low = low, high = high),
   type = "candlestick"
 )
+
+## ----boxplot------------------------------------------------------------------
+data("mpg", package = "ggplot2")
+apex(mpg, aes(hwy, class), "boxplot") %>% 
+  ax_plotOptions(
+    boxPlot = boxplot_opts(color.upper = "#8BB0A6", color.lower = "#8BB0A6" )
+  ) %>% 
+  ax_stroke(colors = list("#2A5769"))
+
+## ----dumbbell-----------------------------------------------------------------
+data("life_expec", package = "apexcharter")
+
+apex(life_expec, aes(country, x = `1972`, xend = `2007`), type = "dumbbell") %>% 
+  ax_plotOptions(
+    bar = bar_opts(
+      dumbbellColors = list(list("#3d85c6", "#fb6003"))
+    )
+  ) %>% 
+  ax_colors("#BABABA") %>% 
+  ax_labs(
+    title = "Life expectancy : 1972 vs. 2007",
+    subtitle = "Data from Gapminder dataset",
+    x = "Life expectancy at birth, in years"
+  )
 
