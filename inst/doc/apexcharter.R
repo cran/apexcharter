@@ -175,7 +175,11 @@ apex(mpg, aes(hwy, class), "boxplot") %>%
   ax_plotOptions(
     boxPlot = boxplot_opts(color.upper = "#8BB0A6", color.lower = "#8BB0A6" )
   ) %>% 
-  ax_stroke(colors = list("#2A5769"))
+  ax_stroke(colors = list("#2A5769")) %>% 
+  ax_grid(
+    xaxis = list(lines = list(show = TRUE)),
+    yaxis = list(lines = list(show = FALSE))
+  )
 
 ## ----dumbbell-----------------------------------------------------------------
 data("life_expec", package = "apexcharter")
