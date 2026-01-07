@@ -66,7 +66,7 @@
 #'
 #' @format A data frame with 3,033 observations and 3 variables.
 #'
-#' @source Rte (Réseau et transport d'électricité) (\url{https://www.rte-france.com/eco2mix} and \url{https://opendata.reseaux-energies.fr/})
+#' @source Rte (Réseau et transport d'électricité) (\url{https://www.rte-france.com/donnees-publications/eco2mix-donnees-temps-reel} and \url{https://opendata.reseaux-energies.fr/})
 "eco2mix"
 
 
@@ -76,7 +76,7 @@
 #'
 #' @format A data frame with 365 observations and 6 variables.
 #'
-#' @source Enedis (\url{https://data.enedis.fr/explore/dataset/donnees-de-temperature-et-de-pseudo-rayonnement/})
+#' @source Enedis (\url{https://opendata.enedis.fr/datasets/donnees-de-temperature-et-de-pseudo-rayonnement/})
 "temperatures"
 
 
