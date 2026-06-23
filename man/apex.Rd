@@ -30,7 +30,8 @@ a \code{data.frame}, it will be coerced to with \code{as.data.frame}.}
 \code{"pie"}, \code{"donut"},
 \code{"radialBar"}, \code{"radar"}, \code{"scatter"},
 \code{"heatmap"}, \code{"treemap"},
-\code{"timeline"}, \code{"dumbbell"} and \code{"slope"}.}
+\code{"timeline"}, \code{"dumbbell"}, \code{"slope"},
+\code{"boxplot"}, \code{"violin"}.}
 
 \item{...}{Other arguments passed on to methods. Not currently used.}
 
@@ -66,25 +67,26 @@ apex(mpg, aes(manufacturer), type = "bar")
 # timeseries
 data("economics", package = "ggplot2")
 apex(
-  data = economics, 
-  mapping = aes(x = date, y = uempmed), 
+  data = economics,
+  mapping = aes(x = date, y = uempmed),
   type = "line"
 )
 
 # you can add option to apex result :
 apex(
-  data = economics, 
-  mapping = aes(x = date, y = uempmed), 
+  data = economics,
+  mapping = aes(x = date, y = uempmed),
   type = "line"
-) \%>\% 
-  ax_stroke(width = 1)
+) \%>\%
+  ax_stroke(width = 1) \%>\%
+  ax_yaxis(min = 0, decimalsInFloat = 0)
 
 
 # with group variable
 data("economics_long", package = "ggplot2")
 apex(
-  data = economics_long, 
-  mapping = aes(x = date, y = value01, group = variable), 
+  data = economics_long,
+  mapping = aes(x = date, y = value01, group = variable),
   type = "line"
 )
 }

@@ -19,21 +19,55 @@ apex(data = mpg, type = "column", mapping = aes(x = manufacturer))
 apex(data = mpg, type = "bar", mapping = aes(x = manufacturer))
 
 ## ----dodge-bar----------------------------------------------------------------
-apex(data = mpg, type = "column", mapping = aes(x = manufacturer, fill = year))
+apex(
+  data = mpg, 
+  type = "column",
+  mapping = aes(x = manufacturer, fill = year)
+)
 
 ## ----stacked-bar--------------------------------------------------------------
-apex(data = mpg, type = "column", mapping = aes(x = manufacturer, fill = year)) %>% 
+apex(
+  data = mpg, 
+  type = "column", 
+  mapping = aes(x = manufacturer, fill = year)
+) %>% 
   ax_chart(stacked = TRUE)
 
 ## ----line---------------------------------------------------------------------
-data("economics")
+data("economics", package = "ggplot2")
 
-apex(data = economics, type = "line", mapping = aes(x = date, y = uempmed))
+apex(
+  data = economics, 
+  type = "line", 
+  mapping = aes(x = date, y = uempmed)
+)
+
+## ----line-lttb----------------------------------------------------------------
+data("economics", package = "ggplot2")
+
+apex(
+  data = economics, 
+  type = "line", 
+  mapping = aes(x = date, y = uempmed)
+) %>% 
+  ax_chart(
+    animations = list(enabled = FALSE),
+    dataReducer = list(
+      enabled = TRUE,
+      algorithm = "lttb",
+      targetPoints = 500,
+      threshold = 1000
+    )
+  )
 
 ## ----lines--------------------------------------------------------------------
-data("economics_long")
+data("economics_long", package = "ggplot2")
 
-apex(data = economics_long, type = "line", mapping = aes(x = date, y = value01, group = variable)) %>% 
+apex(
+  data = economics_long,
+  type = "line",
+  mapping = aes(x = date, y = value01, group = variable)
+) %>% 
   ax_yaxis(decimalsInFloat = 2) # number of decimals to keep
 
 ## ----area---------------------------------------------------------------------
@@ -145,7 +179,7 @@ apex(mtcars, aes(rownames(mtcars), mpg), type = "polarArea") %>%
 ## ----heatmap------------------------------------------------------------------
 # create some data
 sales <- expand.grid(year = 2010:2020, month = month.name)
-sales$value <- sample(-10:30, nrow(sales), TRUE)
+sales$value <- sample(0:50, nrow(sales), TRUE)
 
 apex(
   data = sales,
@@ -153,7 +187,23 @@ apex(
   mapping = aes(x = year, y = month, fill = value)
 ) %>% 
   ax_dataLabels(enabled = FALSE) %>% 
-  ax_colors("#008FFB")
+  ax_colors("#008FFB") %>%
+  ax_plotOptions(
+    heatmap = list(
+      shadeIntensity = 0.5,
+      radius = 2,
+      useFillColorAsStroke = FALSE,
+      colorScale = list(
+        gradientLegend = list(
+          enabled = TRUE,
+          width = "75%",
+          thickness = 14,
+          showHoverValue = TRUE
+        )
+      )
+    )
+  ) %>% 
+  ax_legend(position = "right")
 
 ## ----treemap------------------------------------------------------------------
 data("mpg", package = "ggplot2")
@@ -180,6 +230,18 @@ apex(mpg, aes(hwy, class), "boxplot") %>%
     xaxis = list(lines = list(show = TRUE)),
     yaxis = list(lines = list(show = FALSE))
   )
+
+## ----violin-------------------------------------------------------------------
+data("mpg", package = "ggplot2")
+apex(mpg, aes(hwy, class), "violin") %>%
+  ax_plotOptions(
+    bar = list(distributed = TRUE),
+    violin = list(
+      bandwidthScale = 1,
+      points = list(show = TRUE, size = 3)
+    )
+  ) %>%
+  ax_colors(scales::brewer_pal(type = "qual")(7))
 
 ## ----dumbbell-----------------------------------------------------------------
 data("life_expec", package = "apexcharter")
