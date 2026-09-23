@@ -124,7 +124,11 @@ apex(data = mtcars, type = "scatter", mapping = aes(x = wt, y = mpg))
 apex(data = mtcars, type = "scatter", mapping = aes(x = wt, y = mpg, fill = cyl))
 
 ## ----bubbles------------------------------------------------------------------
-apex(data = mtcars, type = "scatter", mapping = aes(x = wt, y = mpg, z = scales::rescale(qsec)))
+apex(
+  data = mtcars, 
+  type = "scatter",
+  mapping = aes(x = wt, y = mpg, z = scales::rescale(qsec))
+)
 
 ## ----pie----------------------------------------------------------------------
 poll <- data.frame(
@@ -166,7 +170,11 @@ new_mtcars <- reshape(
   drop = c("mpg", "cyl", "hp", "dist", "qsec", "vs", "am", "gear", "carb")
 )
 
-apex(data = new_mtcars, type = "radar", mapping = aes(x = model, y = value, group = time))
+apex(
+  data = new_mtcars,
+  type = "radar",
+  mapping = aes(x = model, y = value, group = time)
+)
 
 ## ----polar-area---------------------------------------------------------------
 apex(mtcars, aes(rownames(mtcars), mpg), type = "polarArea") %>% 
@@ -270,7 +278,9 @@ apex(
 ) %>% 
   ax_chart(animations = list(enabled = FALSE)) %>% 
   # aurora nord12 = #d08770 / aurora nord14 = #a3be8c -> darken colorspace::darken(, amount = 0.3)
-  ax_colors(ifelse(unique(life_expec_long[, c("country", "type")])$type == "decreased", "#955945", "#6A8354")) %>% 
+  ax_colors(
+    ifelse(unique(life_expec_long[, c("country", "type")])$type == "decreased", "#955945", "#6A8354")
+  ) %>% 
   ax_labs(
     title = "Life expectancy : 1972 vs. 2007",
     subtitle = "Data from Gapminder dataset",
@@ -278,4 +288,21 @@ apex(
   ) %>% 
   # ax_dataLabels(enabled = FALSE) %>% # show or note the labels + values
   ax_xaxis(position = "bottom")
+
+## ----streamgraph, warning=FALSE-----------------------------------------------
+blockbusters %>% 
+  subset(
+    genre %in% c("Action", "Adventure", "Comedy", "Drama", "Animation")
+  ) %>% 
+  apex(
+    mapping = aes(
+      x = as.Date(paste0(year, "-01-01")), 
+      y = worldwide_gross, 
+      fill = genre
+    ),
+    type = "streamgraph",
+    height = "600px"
+  ) %>% 
+  ax_xaxis(type = "datetime") %>% 
+  ax_colors(scales::brewer_pal("qual", palette = "Set1")(5))
 

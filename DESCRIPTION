@@ -1,5 +1,5 @@
 Package: apexcharter
-Version: 0.5.0
+Version: 0.5.1
 Title: Create Interactive Chart with the JavaScript 'ApexCharts'
         Library
 Description: Provides an 'htmlwidgets' interface to 'apexcharts.js'. 
@@ -14,7 +14,7 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 ByteCompile: true
-Depends: R (>= 2.10)
+Depends: R (>= 3.5)
 Imports: htmltools, htmlwidgets (>= 1.5.3), magrittr, rlang, ggplot2,
         jsonlite, shiny (>= 1.1.0)
 Suggests: testthat, knitr, scales, rmarkdown, covr
@@ -22,13 +22,13 @@ URL: https://github.com/dreamRs/apexcharter,
         https://dreamrs.github.io/apexcharter/
 BugReports: https://github.com/dreamRs/apexcharter/issues
 VignetteBuilder: knitr
-Config/roxygen2/version: 8.0.0
+Config/roxygen2/version: 8.1.0
 NeedsCompilation: no
-Packaged: 2026-06-23 19:59:05 UTC; perri
+Packaged: 2026-09-23 13:14:51 UTC; perri
 Author: Victor Perrier [aut, cre],
   Fanny Meyer [aut],
   Juned Chhipa [cph] (apexcharts.js library),
   Mike Bostock [cph] (d3.format library)
 Maintainer: Victor Perrier <victor.perrier@dreamrs.fr>
 Repository: CRAN
-Date/Publication: 2026-06-23 20:10:02 UTC
+Date/Publication: 2026-09-23 14:20:09 UTC
